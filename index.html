@@ -18,12 +18,21 @@
         .hidden { display: none !important; }
         .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .label-strong { font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
+        
+        /* Pantalla Fuera de Horario */
+        #pantalla-cerrado { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
     </style>
 </head>
 <body onload="initMap()">
 
-<div class="app-container shadow-2xl p-4">
-    <!-- Encabezado con Imagen y Eslogan -->
+<!-- PANTALLA DE CERRADO -->
+<div id="pantalla-cerrado" class="hidden">
+    <img src="png.png" alt="Logo" class="h-32 mb-6 object-contain">
+    <h2 class="text-xl font-bold text-slate-700">En este momento no estoy trabajando 😴</h2>
+</div>
+
+<div id="contenido-app" class="app-container shadow-2xl p-4">
+    <!-- Encabezado -->
     <div class="text-center mb-4">
         <img src="png.png" alt="Mandaditos Logo" class="mx-auto h-28 w-auto mb-1 object-contain">
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
@@ -35,12 +44,11 @@
         <input id="inputD" type="text" placeholder="🏁 Punto de Entrega (Dirección)" class="input-mini border-blue-200">
     </div>
 
-    <!-- Mapa -->
     <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner">
         <div id="map"></div>
     </div>
 
-    <!-- DATOS DEL QUE ENVÍA -->
+    <!-- DATOS -->
     <div class="section-card border-blue-100">
         <span class="label-strong">👤 Datos de quien Envía</span>
         <div class="grid grid-cols-2 gap-2">
@@ -49,7 +57,6 @@
         </div>
     </div>
 
-    <!-- DATOS DEL QUE RECIBE -->
     <div class="section-card border-blue-100">
         <span class="label-strong">📦 Datos de quien Recibe</span>
         <div class="grid grid-cols-2 gap-2">
@@ -58,7 +65,7 @@
         </div>
     </div>
 
-    <!-- PAGO Y OBSERVACIONES -->
+    <!-- PAGO -->
     <div class="section-card bg-blue-50 border-blue-200">
         <span class="label-strong text-center border-none">¿Hay que pagar algo al retirar?</span>
         <div class="flex justify-center gap-10 font-black text-slate-800 my-2">
@@ -74,7 +81,7 @@
         </div>
     </div>
 
-    <!-- PRECIO Y BOTÓN -->
+    <!-- PRECIO -->
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Costo del envío estimado</p>
@@ -87,10 +94,23 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
 
 <script>
+// ==========================================
+// INTERRUPTOR: Cambia "ON" por "OFF" para cerrar
+// ==========================================
+const ESTADO_APP = "ON"; 
+// ==========================================
+
 let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
 let costoEnvio = 0;
 
 function initMap() {
+    // Si está en OFF, ocultamos todo y mostramos el mensaje
+    if (ESTADO_APP === "OFF") {
+        document.getElementById("contenido-app").style.display = "none";
+        document.getElementById("pantalla-cerrado").classList.remove("hidden");
+        return;
+    }
+
     geocoder = new google.maps.Geocoder();
     const centro = { lat: -27.3670, lng: -55.8961 };
     directionsService = new google.maps.DirectionsService();
