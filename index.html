@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandaditos App - Retiro de Productos</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=TU_CLAVE_API&libraries=places"></script>
     <style>
         :root { --primary: #ffc107; --dark: #212529; }
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; color: var(--dark); }
-        .container { max-width: 500px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: auto; }
-        h1 { text-align: center; color: var(--dark); font-size: 22px; }
-        label { display: block; margin-top: 15px; font-weight: bold; margin-bottom: 5px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .map { height: 200px; width: 100%; margin-top: 10px; border-radius: 8px; }
-        .btn-send { background: #25d366; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-        .monto-abono { display: none; margin-top: 10px; }
-        .small-print { font-size: 11px; color: #777; text-align: center; margin-top: 15px; line-height: 1.4; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; color: var(--dark); }
+        .container { max-width: 450px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
+        h1 { text-align: center; font-size: 20px; margin-bottom: 20px; color: var(--dark); border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: 700; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-top: 5px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; font-size: 18px; font-weight: bold; }
+        .monto-abono { display: none; background: #fff9e6; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        .btn-send { background: #25d366; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
+        .btn-send:active { transform: scale(0.98); }
+        .small-print { font-size: 11px; color: #888; text-align: center; margin-top: 15px; line-height: 1.4; font-style: italic; }
     </style>
 </head>
 <body>
@@ -24,91 +24,46 @@
 <div class="container">
     <h1>Retiro de productos o estudios médicos</h1>
 
-    <label>¿Dónde hay que retirar?</label>
-    <input id="origen" type="text" placeholder="Calle y altura del retiro">
-    <div id="map-origen" class="map"></div>
+    <label>📍 ¿Dónde hay que retirar?</label>
+    <input id="origen" type="text" placeholder="Ej: Laboratorio central o Calle... 123">
 
-    <label>¿Dónde hay que entregar?</label>
-    <input id="destino" type="text" placeholder="Calle y altura de la entrega">
-    <div id="map-destino" class="map"></div>
+    <label>📍 ¿Dónde hay que entregar?</label>
+    <input id="destino" type="text" placeholder="Barrio o dirección de entrega">
 
-    <label>¿Qué hay que retirar?</label>
-    <textarea id="detalle" rows="3" placeholder="Por favor, sea lo más específico posible (ej: estudios de Rayos X a nombre de...)"></textarea>
+    <label>📦 ¿Qué hay que retirar?</label>
+    <textarea id="detalle" rows="3" placeholder="Ej: Estudios Rayos X a nombre de Juan Pérez. Sea lo más específico posible."></textarea>
 
-    <label>¿Hay que abonar el producto al retirar?</label>
+    <label>💰 ¿Hay que abonar al retirar?</label>
     <select id="pago-si-no" onchange="toggleMonto()">
-        <option value="no">No</option>
-        <option value="si">Sí</option>
+        <option value="no">No, ya está pago / es gratis</option>
+        <option value="si">Sí, hay que pagar en el lugar</option>
     </select>
 
     <div id="caja-monto" class="monto-abono">
-        <label>¿Cuánto hay que abonar en el lugar?</label>
-        <input id="monto-producto" type="number" placeholder="$ 0.00">
+        <label>¿Cuánto hay que abonar en el retiro?</label>
+        <input id="monto-producto" type="number" placeholder="Ej: 2500">
     </div>
 
     <div class="total-box">
-        Total Envío + Servicio: <span id="total-final">$ 5.000</span>
+        Precio Estimado: <span id="total-final">$ 5.000</span>
     </div>
 
     <button class="btn-send" onclick="enviarWhatsApp()">Pedir Mandadito 🛵</button>
 
     <p class="small-print">
-        * El precio total incluye envío punto a punto + $5.000 por servicio de gestión.<br>
+        * El precio total incluye envío + $5.000 por servicio de gestión.<br>
         * Por una espera de más de 30 minutos el precio puede variar.
     </p>
 </div>
 
 <script>
-    let mapA, mapB, markerA, markerB, service;
-    const PRECIO_KM = 400; // Ajustá tu precio por km aquí
-    const COMISION_SERVICIO = 5000;
-    const MI_WHATSAPP = "5493764000000"; // PONÉ TU NÚMERO AQUÍ (con 549)
-
-    function initMap() {
-        const posadas = { lat: -27.367, lng: -55.896 };
-        mapA = new google.maps.Map(document.getElementById("map-origen"), { zoom: 13, center: posadas });
-        mapB = new google.maps.Map(document.getElementById("map-destino"), { zoom: 13, center: posadas });
-        
-        markerA = new google.maps.Marker({ map: mapA, draggable: true });
-        markerB = new google.maps.Marker({ map: mapB, draggable: true });
-        
-        service = new google.maps.DistanceMatrixService();
-
-        // Autocompletado
-        const acA = new google.maps.places.Autocomplete(document.getElementById("origen"));
-        const acB = new google.maps.places.Autocomplete(document.getElementById("destino"));
-
-        acA.addListener("place_changed", () => {
-            const place = acA.getPlace();
-            if (place.geometry) { mapA.setCenter(place.geometry.location); markerA.setPosition(place.geometry.location); calcularTotal(); }
-        });
-
-        acB.addListener("place_changed", () => {
-            const place = acB.getPlace();
-            if (place.geometry) { mapB.setCenter(place.geometry.location); markerB.setPosition(place.geometry.location); calcularTotal(); }
-        });
-    }
-
+    // --- CONFIGURACIÓN ---
+    const MI_NUMERO = "5493764000000"; // CAMBIÁ ESTO POR TU WHATSAPP (CON 549)
+    const COMISION = 5000;
+    
     function toggleMonto() {
         const seleccion = document.getElementById("pago-si-no").value;
         document.getElementById("caja-monto").style.display = (seleccion === "si") ? "block" : "none";
-    }
-
-    function calcularTotal() {
-        const ori = document.getElementById("origen").value;
-        const des = document.getElementById("destino").value;
-
-        if (ori && des) {
-            service.getDistanceMatrix({
-                origins: [ori], destinations: [des], travelMode: 'DRIVING',
-            }, (response, status) => {
-                if (status === 'OK') {
-                    const distanciaKm = response.rows[0].elements[0].distance.value / 1000;
-                    const total = Math.round((distanciaKm * PRECIO_KM) + COMISION_SERVICIO);
-                    document.getElementById("total-final").innerText = "$ " + total.toLocaleString();
-                }
-            });
-        }
     }
 
     function enviarWhatsApp() {
@@ -117,20 +72,23 @@
         const det = document.getElementById("detalle").value;
         const paga = document.getElementById("pago-si-no").value;
         const montoProd = document.getElementById("monto-producto").value || "0";
-        const totalWeb = document.getElementById("total-final").innerText;
+
+        if (!ori || !des || !det) {
+            alert("Por favor completá los datos de retiro y entrega.");
+            return;
+        }
 
         let mensaje = `*NUEVO PEDIDO: RETIRO/ESTUDIOS*%0A%0A`;
         mensaje += `📍 *Retirar en:* ${ori}%0A`;
         mensaje += `📍 *Entregar en:* ${des}%0A`;
         mensaje += `📦 *Detalle:* ${det}%0A`;
         mensaje += `💰 *¿Paga producto?:* ${paga === 'si' ? 'SÍ ($' + montoProd + ')' : 'NO'}%0A%0A`;
-        mensaje += `💵 *TOTAL ENVÍO + SERVICIO:* ${totalWeb}%0A`;
+        mensaje += `💵 *TOTAL ENVÍO + SERVICIO:* $${COMISION} + Envío%0A`;
         mensaje += `_Nota: Precio sujeto a espera mayor a 30 min._`;
 
-        window.open(`https://wa.me/${MI_WHATSAPP}?text=${mensaje}`, '_blank');
+        window.open(`https://wa.me/${MI_NUMERO}?text=${mensaje}`, '_blank');
     }
-
-    window.onload = initMap;
 </script>
+
 </body>
 </html>
