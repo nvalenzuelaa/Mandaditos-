@@ -4,25 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandaditos Posadas</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyCzsxnmmifNkPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
     <style>
         :root { --primary: #ffc107; --dark: #212529; --success: #25d366; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
         .container { max-width: 450px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
         h1 { text-align: center; font-size: 22px; margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
-        
         .card { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        select, input, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
-        
-        #map { height: 200px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ddd; }
-        
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
+        #map { height: 250px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ddd; }
         .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 12px; text-align: center; font-size: 19px; font-weight: bold; }
         .btn-send { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        
         .hidden { display: none; }
-        .small-print { font-size: 11px; color: #777; text-align: center; margin-top: 15px; line-height: 1.4; }
+        .small-print { font-size: 11px; color: #777; text-align: center; margin-top: 15px; }
+        /* Estilo para que el buscador de Google se vea bien en celular */
+        .pac-container { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: 'Segoe UI'; }
     </style>
 </head>
 <body>
@@ -40,23 +37,25 @@
     </div>
 
     <div class="card">
-        <label id="txt-origen">📍 ¿Dónde retiramos?</label>
-        <input id="origen" type="text" placeholder="Ej: Supermercado, Farmacia o Calle...">
+        <label>📍 Lugar de Retiro / Compra:</label>
+        <input id="origen" type="text" placeholder="Calle y altura...">
+        
+        <label>📍 Lugar de Entrega:</label>
+        <input id="destino" type="text" placeholder="Dirección de entrega...">
 
-        <label id="txt-destino">📍 ¿Dónde entregamos?</label>
-        <input id="destino" type="text" placeholder="Tu dirección o barrio">
-
-        <label id="txt-detalle">📦 Detalles (ser lo más específico posible):</label>
+        <label>📦 Detalles específicos:</label>
+        <textarea id="detalle" rows="2" placeholder="Ej: Retirar pedido #123 / Comprar pan..."></textarea>
+    </div>
 
     <div id="seccion-pagos" class="card hidden">
         <label>💰 ¿Hay que abonar en el lugar?</label>
         <select id="pago-si-no" onchange="mostrarMonto()">
-            <option value="no">No, ya está pago</option>
-            <option value="si">Sí, hay que pagar</option>
+            <option value="no">No</option>
+            <option value="si">Sí</option>
         </select>
         <div id="caja-monto" class="hidden">
-            <label>Monto estimado para la compra/trámite:</label>
-            <input id="monto-valor" type="number" placeholder="$ 0.00">
+            <label>Monto a abonar:</label>
+            <input id="monto-valor" type="number" placeholder="Monto en $">
         </div>
     </div>
 
@@ -66,37 +65,64 @@
         Total Estimado: <span id="total-text">$ 1.200</span>
     </div>
 
-    <button class="btn-send" onclick="enviarPedido()">Pedir Mandadito por WhatsApp 📲</button>
-
-    <p class="small-print">
-        * El precio total varía según la distancia real.<br>
-        * Retiro de productos o compras tienen un cargo de gestión + envío.<br>
-        * Esperas mayores a 30 min. tienen recargo.
-    </p>
+    <button class="btn-send" onclick="enviarPedido()">Enviar Pedido por WhatsApp 📲</button>
 </div>
 
 <script>
-    const MI_WHATSAPP = "5493764904731"; 
-    let map, marker;
+    const MI_WHATSAPP = "5493764904731";
+    let map, marker, autocompleteOri, autocompleteDes;
 
     function initMap() {
-        map = L.map('map').setView([-27.367, -55.896], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        marker = L.marker([-27.367, -55.896], {draggable: true}).addTo(map);
+        const posadas = { lat: -27.367, lng: -55.896 };
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: posadas,
+            disableDefaultUI: false
+        });
+
+        marker = new google.maps.Marker({
+            map: map,
+            draggable: true,
+            position: posadas
+        });
+
+        // Configurar Autocompletado
+        const options = {
+            componentRestrictions: { country: "ar" },
+            fields: ["address_components", "geometry", "icon", "name"],
+            strictBounds: false,
+        };
+
+        autocompleteOri = new google.maps.places.Autocomplete(document.getElementById('origen'), options);
+        autocompleteDes = new google.maps.places.Autocomplete(document.getElementById('destino'), options);
+
+        autocompleteOri.addListener('place_changed', function() {
+            const place = autocompleteOri.getPlace();
+            if (place.geometry) {
+                map.setCenter(place.geometry.location);
+                marker.setPosition(place.geometry.location);
+                map.setZoom(16);
+            }
+        });
+
+        autocompleteDes.addListener('place_changed', function() {
+            const place = autocompleteDes.getPlace();
+            if (place.geometry) {
+                map.setCenter(place.geometry.location);
+                marker.setPosition(place.geometry.location);
+                map.setZoom(16);
+            }
+        });
     }
 
     function cambiarServicio() {
         const servicio = document.getElementById("tipo-servicio").value;
-        const seccionPagos = document.getElementById("seccion-pagos");
         const totalText = document.getElementById("total-text");
-
-        if (servicio === "Mandado normal") {
-            seccionPagos.classList.add("hidden");
-            totalText.innerText = "$ 1.200 + envío";
-        } else {
-            seccionPagos.classList.remove("hidden");
-            totalText.innerText = (servicio === "Compras") ? "$ 2.000 + envío" : "$ 5.000 + envío";
-        }
+        document.getElementById("seccion-pagos").classList.toggle("hidden", servicio === "Mandado normal");
+        
+        if (servicio === "Mandado normal") totalText.innerText = "$ 1.200 + envío";
+        else if (servicio === "Compras") totalText.innerText = "$ 2.000 + envío";
+        else totalText.innerText = "$ 5.000 + envío";
     }
 
     function mostrarMonto() {
@@ -105,36 +131,28 @@
     }
 
     function enviarPedido() {
-        const servicio = document.getElementById("tipo-servicio").value;
         const ori = document.getElementById("origen").value;
         const des = document.getElementById("destino").value;
         const det = document.getElementById("detalle").value;
-        const paga = document.getElementById("pago-si-no").value;
+        const servicio = document.getElementById("tipo-servicio").value;
+        const total = document.getElementById("total-text").innerText;
         const monto = document.getElementById("monto-valor").value;
-        const presupuesto = document.getElementById("total-text").innerText;
+        
+        if(!ori || !des) return alert("Por favor, ingresá las direcciones.");
 
-        if(!ori || !des || !det) return alert("Por favor, completá los datos.");
-
+        const pos = marker.getPosition();
         let msg = `*NUEVO PEDIDO: ${servicio.toUpperCase()}*%0A%0A`;
-        msg += `📍 *Lugar:* ${ori}%0A`;
+        msg += `📍 *Retiro:* ${ori}%0A`;
         msg += `📍 *Entrega:* ${des}%0A`;
         msg += `📦 *Detalle:* ${det}%0A`;
-        
-        if (servicio !== "Mandado normal") {
-            msg += `💰 *Abona en lugar:* ${paga === 'si' ? 'SÍ ($' + monto + ')' : 'NO'}%0A`;
-        }
-
-        msg += `%0A💵 *Presupuesto base:* ${presupuesto}%0A`;
-        msg += `_Nota: Sujeto a espera > 30 min._`;
+        if (monto) msg += `💰 *Abonar:* $${monto}%0A`;
+        msg += `💰 *Presupuesto:* ${total}%0A`;
+        msg += `📍 *GPS:* https://www.google.com/maps?q=${pos.lat()},${pos.lng()}`;
 
         window.open(`https://wa.me/${MI_WHATSAPP}?text=${msg}`);
     }
 
-    window.onload = function() {
-        initMap();
-        cambiarServicio();
-    };
+    google.maps.event.addDomListener(window, 'load', initMap);
 </script>
-
 </body>
 </html>
