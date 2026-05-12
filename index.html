@@ -24,8 +24,8 @@
 
 <div class="app-container shadow-2xl p-4">
     <div class="text-center mb-4">
-        <h1 class="text-3xl font-black tracking-tighter text-slate-900 leading-none">Solicitud de Motomandado</h1>
-        <p class="text-blue-600 font-bold text-xs mt-1 italic uppercase tracking-widest">Servicio Inmediato 🏍️</p>
+        <h1 class="text-3xl font-black tracking-tighter text-slate-900 leading-none">Mandaditos App</h1>
+        <p class="text-blue-600 font-bold text-xs mt-1 italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div>
 
     <div class="space-y-2">
@@ -60,11 +60,11 @@
             <label class="flex items-center gap-2 cursor-pointer text-lg"><input type="radio" name="pago" value="no" checked class="w-5 h-5" onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
         </div>
         <div id="boxMonto" class="hidden mt-3">
-            <input id="fMonto" type="number" placeholder="¿Cuánto dinero entregar? $" class="input-mini text-center border-blue-400 font-bold text-blue-900">
+            <input id="fMonto" type="number" placeholder="Monto en efectivo $" class="input-mini text-center border-blue-400 font-bold text-blue-900">
         </div>
         <div class="mt-4">
             <span class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
-            <textarea id="obs" placeholder="Ej: Una caja pequeña, documentos, llaves..." class="input-mini h-20"></textarea>
+            <textarea id="obs" placeholder="Ej: Llaves, comida, sobre..." class="input-mini h-20"></textarea>
         </div>
     </div>
 
@@ -86,32 +86,16 @@ let costoEnvio = 0;
 function initMap() {
     geocoder = new google.maps.Geocoder();
     const centro = { lat: -27.3670, lng: -55.8961 };
-    
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ 
         polylineOptions: { strokeColor: "#2563eb", strokeWeight: 6 }, 
         suppressMarkers: true 
     });
-    
-    map = new google.maps.Map(document.getElementById("map"), { 
-        center: centro, 
-        zoom: 15, 
-        disableDefaultUI: true, 
-        gestureHandling: "greedy" 
-    });
-    
+    map = new google.maps.Map(document.getElementById("map"), { center: centro, zoom: 15, disableDefaultUI: true, gestureHandling: "greedy" });
     directionsRenderer.setMap(map);
 
-    // PIN A y B configurados cerca
-    markerO = new google.maps.Marker({ 
-        position: { lat: -27.3665, lng: -55.8955 }, 
-        map, draggable: true, label: "A"
-    });
-    
-    markerD = new google.maps.Marker({ 
-        position: { lat: -27.3675, lng: -55.8965 }, 
-        map, draggable: true, label: "B"
-    });
+    markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
+    markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
 
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
@@ -156,29 +140,40 @@ function enviarWhatsApp() {
     const tO = document.getElementById('fTelO').value || "-";
     const nD = document.getElementById('fNombreD').value || "-";
     const tD = document.getElementById('fTelD').value || "-";
-    const dO = document.getElementById('inputO').value;
-    const dD = document.getElementById('inputD').value;
+    const dO = document.getElementById('inputO').value || "-";
+    const dD = document.getElementById('inputD').value || "-";
     const obs = document.getElementById('obs').value || "Ninguna";
     const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
     const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
 
-    // Coordenadas para los links de GPS
-    const latO = markerO.getPosition().lat();
-    const lngO = markerO.getPosition().lng();
-    const latD = markerD.getPosition().lat();
-    const lngD = markerD.getPosition().lng();
+    const latO = markerO.getPosition().lat().toFixed(6);
+    const lngO = markerO.getPosition().lng().toFixed(6);
+    const latD = markerD.getPosition().lat().toFixed(6);
+    const lngD = markerD.getPosition().lng().toFixed(6);
 
-    let msg = `*COMANDA MOTOMANDADO*%0A%0A`;
-    msg += `🔵 *DATOS DE ENVÍO:*%0A- Nombre: ${nO}%0A- Cel: ${tO}%0A- Dirección: ${dO}%0A📍 *Link GPS Retiro:* https://www.google.com/maps/search/?api=1&query=${latO},${lngO}%0A%0A`;
-    msg += `🔵 *DATOS DE ENTREGA:*%0A- Nombre: ${nD}%0A- Cel: ${tD}%0A- Dirección: ${dD}%0A📍 *Link GPS Entrega:* https://www.google.com/maps/search/?api=1&query=${latD},${lngD}%0A%0A`;
-    msg += `📝 *DETALLES:* ${obs}%0A%0A`;
+    let msg = "*COMANDA MANDADITOS*%0A%0A";
+    msg += "*1. RETIRO (Punto A):*%0A";
+    msg += "- Nombre: " + nO + "%0A";
+    msg += "- Cel: " + tO + "%0A";
+    msg += "- Dirección: " + dO + "%0A";
+    msg += "📍 GPS: https://www.google.com/maps?q=" + latO + "," + lngO + "%0A%0A";
     
-    if(hayQuePagar) { msg += `💰 *Abonar en retiro:* $${montoEfectivo}%0A`; }
+    msg += "*2. ENTREGA (Punto B):*%0A";
+    msg += "- Nombre: " + nD + "%0A";
+    msg += "- Cel: " + tD + "%0A";
+    msg += "- Dirección: " + dD + "%0A";
+    msg += "🏁 GPS: https://www.google.com/maps?q=" + latD + "," + lngD + "%0A%0A";
+    
+    msg += "*3. DETALLES:*%0A";
+    msg += "- Llevar: " + obs + "%0A";
+    if(hayQuePagar) { msg += "- Abonar en lugar: $" + montoEfectivo + "%0A"; }
+    
+    msg += "%0A*4. TOTALES:*%0A";
+    msg += "- Envío: $" + costoEnvio + "%0A";
+    const totalFinal = parseInt(costoEnvio) + parseInt(montoEfectivo);
+    msg += "*⭐ TOTAL A COBRAR: $" + totalFinal + "*";
 
-    msg += `💵 *Costo Envío:* $${costoEnvio}%0A`;
-    msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A`;
-
-    window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
+    window.location.href = "https://api.whatsapp.com/send?phone=543764904731&text=" + msg;
 }
 </script>
 </body>
