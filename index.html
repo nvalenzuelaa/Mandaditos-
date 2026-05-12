@@ -2,155 +2,177 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandaditos Posadas</title>
-    <!-- Google Maps con Places y Directions -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mandaditos App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --primary: #ffc107; --dark: #212529; --success: #25d366; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
-        .container { max-width: 450px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
-        h1 { text-align: center; font-size: 22px; margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
-        .card { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
-        #map { height: 250px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ddd; }
-        .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 12px; text-align: center; font-size: 19px; font-weight: bold; }
-        .btn-send { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .hidden { display: none; }
+        :root { --brand: #2563eb; }
+        body { background-color: #f8fafc; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
+        .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        #map-container { width: 100%; height: 380px; position: relative; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; }
+        #map { height: 100%; width: 100%; }
+        .hidden { display: none !important; }
+        .input-mini { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 13px; outline: none; background: #f1f5f9; }
+        .input-mini:focus { border-color: var(--brand); background: #fff; }
+        .btn-main { background: var(--brand); color: white; padding: 15px; border-radius: 16px; font-weight: 700; width: 100%; text-transform: uppercase; }
+        .btn-back { color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; display: inline-flex; items-center; margin-bottom: 10px; cursor: pointer; }
+        .card-servicio { border: 1px solid #e2e8f0; padding: 15px; border-radius: 20px; display: flex; items-center; gap: 12px; cursor: pointer; background: #fff; margin-bottom: 10px; }
+        .precio-box { background: #1e293b; color: white; padding: 20px; border-radius: 24px 24px 0 0; position: sticky; bottom: 0; }
     </style>
 </head>
-<body>
+<body onload="verificarHorario()">
 
-<div class="container">
-    <h1>🛵 Mandaditos Posadas</h1>
-
-    <div class="card">
-        <label>¿Qué servicio necesitás?</label>
-        <select id="tipo-servicio" onchange="calcularRuta()">
-            <option value="Mandado normal">Mandado normal</option>
-            <option value="Retiro de productos o estudios medicos">Retiro de productos o estudios médicos</option>
-            <option value="Compras">Compras</option>
-        </select>
+<div class="app-container shadow-2xl">
+    <div class="p-6 pb-4 text-center">
+        <h1 class="text-2xl font-black tracking-tighter text-slate-900 leading-none">Mandaditos</h1>
+        <p class="text-slate-400 font-bold text-xs mt-1 italic">Tu moto de confianza 🏍️</p>
     </div>
 
-    <div class="card">
-        <label>📍 Lugar de Retiro / Compra:</label>
-        <input id="origen" type="text" placeholder="Calle y altura...">
-        
-        <label>📍 Lugar de Entrega:</label>
-        <input id="destino" type="text" placeholder="Dirección de entrega...">
+    <div id="contenidoApp" class="flex flex-col flex-grow">
+        <div id="paso1" class="p-6">
+            <p class="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-4">Elegí el servicio</p>
+            <div onclick="irAPaso2('Mandado normal', 0)" class="card-servicio"><span class="text-2xl">📦</span> <b class="text-slate-800">Mandado normal</b></div>
+            <div onclick="irAPaso2('Retiro de productos o estudios medicos', 5000)" class="card-servicio"><span class="text-2xl">🏥</span> <b class="text-slate-800">Retiro de productos o estudios médicos</b></div>
+            <div onclick="irAPaso2('Compras', 5000)" class="card-servicio"><span class="text-2xl">🛒</span> <b class="text-slate-800">Compras</b></div>
+        </div>
 
-        <label>📦 Detalles específicos:</label>
-        <textarea id="detalle" rows="2" placeholder="Ej: Retirar pedido #123..."></textarea>
-    </div>
+        <div id="paso2" class="hidden flex flex-col flex-grow">
+            <div class="px-6 pb-4">
+                <div onclick="volverAPaso1()" class="btn-back">⬅️ Volver</div>
+                <div class="space-y-2">
+                    <input id="inputO" type="text" placeholder="📍 ¿Dónde retiramos / compramos?" class="input-mini">
+                    <input id="inputD" type="text" placeholder="🏁 ¿A dónde llevamos?" class="input-mini">
+                </div>
+            </div>
+            <div id="map-container"><div id="map"></div></div>
+            <div id="boxPrecio" class="precio-box hidden">
+                <div class="flex justify-between items-center">
+                    <div><p class="text-2xl font-black italic text-white">$<span id="precioTotal">0</span></p></div>
+                    <button onclick="irAPaso3()" class="bg-blue-600 px-6 py-3 rounded-xl font-black uppercase text-xs text-white">Siguiente</button>
+                </div>
+                <p class="text-[9px] text-slate-400 mt-2">* Precio sujeto a espera mayor a 30 min.</p>
+            </div>
+        </div>
 
-    <div id="seccion-pagos" class="card hidden">
-        <label>💰 ¿Hay que abonar en el lugar?</label>
-        <select id="pago-si-no" onchange="mostrarMonto()">
-            <option value="no">No</option>
-            <option value="si">Sí</option>
-        </select>
-        <div id="caja-monto" class="hidden">
-            <input id="monto-valor" type="number" placeholder="¿Cuánto dinero llevamos?">
+        <div id="paso3" class="hidden p-6 space-y-5">
+            <div onclick="volverAPaso2()" class="btn-back">⬅️ Volver al mapa</div>
+            <div class="space-y-4">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">👤 Tus Datos</p>
+                    <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini mb-2">
+                    <input id="fTelO" type="tel" placeholder="Tu WhatsApp (Ej: 3764000000)" class="input-mini">
+                </div>
+                
+                <div id="seccionAbonar" class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">¿Hay que abonar algo en el lugar?</p>
+                    <div class="flex gap-6 font-bold text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
+                        <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
+                    </div>
+                    <div id="boxMonto" class="hidden mt-3"><input id="fMonto" type="number" placeholder="¿Cuánto dinero? $" class="input-mini"></div>
+                </div>
+
+                <textarea id="obs" placeholder="Detalles del pedido (Ej: Retirar placa a nombre de...)" class="input-mini h-20"></textarea>
+            </div>
+            <button onclick="enviarWhatsApp()" class="btn-main !bg-green-600">Enviar Pedido por WhatsApp 🚀</button>
         </div>
     </div>
-
-    <div id="map"></div>
-
-    <div class="total-box">
-        Total Estimado: <span id="total-text">$ 0</span>
-    </div>
-
-    <button class="btn-send" onclick="enviarPedido()">Pedir Mandadito por WhatsApp 📲</button>
 </div>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
 <script>
-    const MI_WHATSAPP = "5493764904731";
-    let map, directionsService, directionsRenderer, autocompleteOri, autocompleteDes;
+let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
+let servSelect = "", costoEnvio = 0, plusServicio = 0;
 
-    function initMap() {
-        const posadas = { lat: -27.367, lng: -55.896 };
-        map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 13,
-            center: posadas,
-            disableDefaultUI: true
-        });
+function verificarHorario() {}
 
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+function irAPaso2(servicio, plus) {
+    servSelect = servicio; plusServicio = plus;
+    document.getElementById('paso1').classList.add('hidden');
+    document.getElementById('paso2').classList.remove('hidden');
+    // Mostrar/Ocultar sección de abono según el servicio
+    if(servicio === 'Mandado normal') document.getElementById('seccionAbonar').classList.add('hidden');
+    else document.getElementById('seccionAbonar').classList.remove('hidden');
+    
+    setTimeout(() => { if (!map) initMap(); else google.maps.event.trigger(map, 'resize'); }, 300);
+}
 
-        // Autocompletado limitado a Argentina
-        const options = { componentRestrictions: { country: "ar" } };
-        autocompleteOri = new google.maps.places.Autocomplete(document.getElementById('origen'), options);
-        autocompleteDes = new google.maps.places.Autocomplete(document.getElementById('destino'), options);
+function volverAPaso1() { document.getElementById('paso2').classList.add('hidden'); document.getElementById('paso1').classList.remove('hidden'); }
+function volverAPaso2() { document.getElementById('paso3').classList.add('hidden'); document.getElementById('paso2').classList.remove('hidden'); }
+function irAPaso3() { document.getElementById('paso2').classList.add('hidden'); document.getElementById('paso3').classList.remove('hidden'); window.scrollTo(0,0); }
 
-        autocompleteOri.addListener('place_changed', calcularRuta);
-        autocompleteDes.addListener('place_changed', calcularRuta);
-    }
+function initMap() {
+    geocoder = new google.maps.Geocoder();
+    const posO = { lat: -27.3670, lng: -55.8961 };
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#2563eb", strokeWeight: 5 }, suppressMarkers: true });
+    map = new google.maps.Map(document.getElementById("map"), { center: posO, zoom: 14, disableDefaultUI: true, gestureHandling: "greedy" });
+    directionsRenderer.setMap(map);
+    markerO = new google.maps.Marker({ position: posO, map, draggable: true });
+    markerD = new google.maps.Marker({ position: { lat: -27.38, lng: -55.91 }, map, draggable: true });
 
-    function calcularRuta() {
-        const ori = document.getElementById('origen').value;
-        const des = document.getElementById('destino').value;
-        const servicio = document.getElementById("tipo-servicio").value;
+    const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
+    const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
 
-        // Mostrar u ocultar sección de pagos según servicio
-        document.getElementById("seccion-pagos").classList.toggle("hidden", servicio === "Mandado normal");
+    autoO.addListener('place_changed', () => {
+        const place = autoO.getPlace();
+        if(place.geometry) { markerO.setPosition(place.geometry.location); map.setCenter(markerO.getPosition()); trazar(); }
+    });
+    autoD.addListener('place_changed', () => {
+        const place = autoD.getPlace();
+        if(place.geometry) { markerD.setPosition(place.geometry.location); trazar(); }
+    });
 
-        if (!ori || !des) return;
+    markerO.addListener('dragend', () => reverseGeocode(markerO.getPosition(), 'O'));
+    markerD.addListener('dragend', () => reverseGeocode(markerD.getPosition(), 'D'));
+}
 
-        directionsService.route({
-            origin: ori,
-            destination: des,
-            travelMode: google.maps.TravelMode.DRIVING
-        }, (response, status) => {
-            if (status === "OK") {
-                directionsRenderer.setDirections(response);
-                const distanciaKm = response.routes[0].legs[0].distance.value / 1000;
-                actualizarPrecio(distanciaKm, servicio);
-            }
-        });
-    }
+function reverseGeocode(pos, type) {
+    geocoder.geocode({ location: pos }, (results, status) => {
+        if (status === "OK" && results[0]) {
+            if (type === 'O') document.getElementById('inputO').value = results[0].formatted_address;
+            else document.getElementById('inputD').value = results[0].formatted_address;
+            trazar();
+        }
+    });
+}
 
-    function actualizarPrecio(km, servicio) {
-        let base = 1200; // Mandado normal base
-        if (servicio === "Compras") base = 2000;
-        if (servicio === "Retiro de productos o estudios medicos") base = 5000;
+function trazar() {
+    directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), travelMode: 'DRIVING' }, (res, stat) => {
+        if (stat === 'OK') {
+            directionsRenderer.setDirections(res);
+            let kms = (res.routes[0].legs[0].distance.value / 1000);
+            // Cálculo: Base 1200 + Km a 350 + Plus de servicio
+            costoEnvio = Math.ceil((1200 + (kms * 350) + plusServicio) / 100) * 100;
+            document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
+            document.getElementById('boxPrecio').classList.remove('hidden');
+        }
+    });
+}
 
-        // Sumamos $300 por cada kilómetro extra después de los primeros 2km
-        let extraKm = km > 2 ? (km - 2) * 300 : 0;
-        let total = Math.round(base + extraKm);
+function enviarWhatsApp() {
+    const dO = document.getElementById('inputO').value;
+    const dD = document.getElementById('inputD').value;
+    const nO = document.getElementById('fNombreO').value || "Cliente";
+    const tO = document.getElementById('fTelO').value;
+    const obs = document.getElementById('obs').value || "Sin observaciones";
+    const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
+    const montoEfectivo = hayQuePagar ? document.getElementById('fMonto').value : 0;
 
-        document.getElementById("total-text").innerText = `$ ${total.toLocaleString('es-AR')}`;
-    }
+    let msg = `*NUEVO PEDIDO - ${servSelect.toUpperCase()}*%0A%0A`;
+    msg += `👤 *Cliente:* ${nO} (${tO})%0A`;
+    msg += `📍 *Retiro:* ${dO}%0A`;
+    msg += `🏁 *Entrega:* ${dD}%0A`;
+    msg += `📦 *Detalle:* ${obs}%0A`;
+    
+    if(hayQuePagar) msg += `💰 *Abonar en lugar:* $${montoEfectivo}%0A`;
+    
+    msg += `%0A💵 *Costo Envío/Servicio:* $${costoEnvio}%0A`;
+    msg += `📍 *Ver en Mapa:* http://www.google.com/maps/place/${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
 
-    function mostrarMonto() {
-        const pago = document.getElementById("pago-si-no").value;
-        document.getElementById("caja-monto").classList.toggle("hidden", pago !== "si");
-    }
-
-    function enviarPedido() {
-        const ori = document.getElementById("origen").value;
-        const des = document.getElementById("destino").value;
-        const det = document.getElementById("detalle").value;
-        const servicio = document.getElementById("tipo-servicio").value;
-        const total = document.getElementById("total-text").innerText;
-        const monto = document.getElementById("monto-valor").value;
-
-        if (!ori || !des) return alert("Por favor, ingresá las direcciones.");
-
-        let msg = `*NUEVO PEDIDO: ${servicio.toUpperCase()}*%0A%0A`;
-        msg += `📍 *Retiro:* ${ori}%0A`;
-        msg += `📍 *Entrega:* ${des}%0A`;
-        msg += `📦 *Detalles:* ${det}%0A`;
-        if (monto) msg += `💰 *Dinero a llevar:* $${monto}%0A`;
-        msg += `%0A💵 *Precio estimado:* ${total}`;
-
-        window.open(`https://wa.me/${MI_WHATSAPP}?text=${msg}`);
-    }
-
-    google.maps.event.addDomListener(window, 'load', initMap);
+    const url = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
+    window.location.href = url;
+}
 </script>
-
 </body>
 </html>
