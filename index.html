@@ -3,92 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandaditos App - Retiro de Productos</title>
+    <title>Mandaditos App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --primary: #ffc107; --dark: #212529; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; color: var(--dark); }
+        :root { --primary: #ffc107; --dark: #212529; --success: #25d366; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
         .container { max-width: 450px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
-        h1 { text-align: center; font-size: 20px; margin-bottom: 20px; color: var(--dark); border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: 700; font-size: 14px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-top: 5px; outline: none; }
-        input:focus { border-color: var(--primary); }
+        h1 { text-align: center; font-size: 22px; color: var(--dark); margin-bottom: 5px; }
+        .service-selector { margin-bottom: 20px; }
+        select, input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-top: 5px; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
+        #map { height: 250px; width: 100%; border-radius: 12px; margin-top: 10px; border: 2px solid #eee; }
         .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; font-size: 18px; font-weight: bold; }
-        .monto-abono { display: none; background: #fff9e6; padding: 10px; border-radius: 10px; margin-top: 10px; }
-        .btn-send { background: #25d366; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
-        .btn-send:active { transform: scale(0.98); }
-        .small-print { font-size: 11px; color: #888; text-align: center; margin-top: 15px; line-height: 1.4; font-style: italic; }
+        .btn-send { background: var(--success); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .extra-fields { display: none; background: #fff9e6; padding: 10px; border-radius: 10px; margin-top: 10px; }
+        .small-print { font-size: 11px; color: #888; text-align: center; margin-top: 15px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Retiro de productos o estudios médicos</h1>
-
-    <label>📍 ¿Dónde hay que retirar?</label>
-    <input id="origen" type="text" placeholder="Ej: Laboratorio central o Calle... 123">
-
-    <label>📍 ¿Dónde hay que entregar?</label>
-    <input id="destino" type="text" placeholder="Barrio o dirección de entrega">
-
-    <label>📦 ¿Qué hay que retirar?</label>
-    <textarea id="detalle" rows="3" placeholder="Ej: Estudios Rayos X a nombre de Juan Pérez. Sea lo más específico posible."></textarea>
-
-    <label>💰 ¿Hay que abonar al retirar?</label>
-    <select id="pago-si-no" onchange="toggleMonto()">
-        <option value="no">No, ya está pago / es gratis</option>
-        <option value="si">Sí, hay que pagar en el lugar</option>
-    </select>
-
-    <div id="caja-monto" class="monto-abono">
-        <label>¿Cuánto hay que abonar en el retiro?</label>
-        <input id="monto-producto" type="number" placeholder="Ej: 2500">
+    <h1>🛵 Mandaditos Posadas</h1>
+    
+    <div class="service-selector">
+        <label>Seleccioná el servicio:</label>
+        <select id="tipo-servicio" onchange="actualizarInterfaz()">
+            <option value="mandado">Mandado General (Envío/Retiro)</option>
+            <option value="productos">Retiro de productos o estudios médicos</option>
+            <option value="tramite">Trámites / Pagos</option>
+        </select>
     </div>
+
+    <div id="campos-comunes">
+        <label id="label-origen">📍 ¿Dónde retiramos?</label>
+        <input id="origen" type="text" placeholder="Ej: Calle Junín 1234">
+        
+        <label id="label-destino">📍 ¿Dónde entregamos?</label>
+        <input id="destino" type="text" placeholder="Ej: Barrio Itambé Miní">
+
+        <label>📦 ¿Qué tenemos que hacer?</label>
+        <textarea id="detalle" rows="3" placeholder="Detallá lo más posible tu pedido..."></textarea>
+    </div>
+
+    <div id="campos-productos" class="extra-fields">
+        <label>💰 ¿Hay que abonar algo en el lugar?</label>
+        <select id="pago-si-no" onchange="actualizarInterfaz()">
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+        </select>
+        <div id="caja-monto" style="display:none">
+            <input id="monto-valor" type="number" placeholder="¿Cuánto dinero? $">
+        </div>
+    </div>
+
+    <div id="map"></div>
 
     <div class="total-box">
-        Precio Estimado: <span id="total-final">$ 5.000</span>
+        Total Estimado: <span id="total-text">$ 0</span>
     </div>
 
-    <button class="btn-send" onclick="enviarWhatsApp()">Pedir Mandadito 🛵</button>
+    <button class="btn-send" onclick="enviarPedido()">Enviar Pedido por WhatsApp 📲</button>
 
     <p class="small-print">
-        * El precio total incluye envío + $5.000 por servicio de gestión.<br>
-        * Por una espera de más de 30 minutos el precio puede variar.
+        * El precio final depende de la distancia y espera.<br>
+        * Retiro de productos tiene un adicional de $5.000 por gestión.<br>
+        * Esperas mayores a 30 min. tienen recargo.
     </p>
 </div>
 
 <script>
-    // --- CONFIGURACIÓN ---
-    const MI_NUMERO = "5493764000000"; // CAMBIÁ ESTO POR TU WHATSAPP (CON 549)
-    const COMISION = 5000;
+    const MI_WHATSAPP = "5493764XXXXXX"; // ¡PONÉ TU NÚMERO ACÁ!
+    let map, marker;
     
-    function toggleMonto() {
-        const seleccion = document.getElementById("pago-si-no").value;
-        document.getElementById("caja-monto").style.display = (seleccion === "si") ? "block" : "none";
+    function initMap() {
+        // Centrado en Posadas
+        map = L.map('map').setView([-27.367, -55.896], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        marker = L.marker([-27.367, -55.896], {draggable: true}).addTo(map);
+        
+        marker.on('dragend', function(e) {
+            console.log("Nueva posición:", marker.getLatLng());
+        });
     }
 
-    function enviarWhatsApp() {
+    function actualizarInterfaz() {
+        const servicio = document.getElementById("tipo-servicio").value;
+        const camposProd = document.getElementById("campos-productos");
+        const cajaMonto = document.getElementById("caja-monto");
+        const pagoSiNo = document.getElementById("pago-si-no").value;
+
+        // Mostrar campos de productos si corresponde
+        camposProd.style.display = (servicio === "productos") ? "block" : "none";
+        cajaMonto.style.display = (pagoSiNo === "si") ? "block" : "none";
+
+        // Cálculo de precio base orientativo
+        let total = 1200; // Base mandado
+        if (servicio === "productos") total = 5000;
+        if (servicio === "tramite") total = 3000;
+        
+        document.getElementById("total-text").innerText = "$ " + total + " + envío";
+    }
+
+    function enviarPedido() {
+        const servicio = document.getElementById("tipo-servicio").value;
         const ori = document.getElementById("origen").value;
         const des = document.getElementById("destino").value;
         const det = document.getElementById("detalle").value;
-        const paga = document.getElementById("pago-si-no").value;
-        const montoProd = document.getElementById("monto-producto").value || "0";
+        const monto = document.getElementById("monto-valor").value;
+        const totalText = document.getElementById("total-text").innerText;
 
-        if (!ori || !des || !det) {
-            alert("Por favor completá los datos de retiro y entrega.");
-            return;
-        }
+        if(!ori || !des || !det) return alert("Completá los datos");
 
-        let mensaje = `*NUEVO PEDIDO: RETIRO/ESTUDIOS*%0A%0A`;
-        mensaje += `📍 *Retirar en:* ${ori}%0A`;
-        mensaje += `📍 *Entregar en:* ${des}%0A`;
-        mensaje += `📦 *Detalle:* ${det}%0A`;
-        mensaje += `💰 *¿Paga producto?:* ${paga === 'si' ? 'SÍ ($' + montoProd + ')' : 'NO'}%0A%0A`;
-        mensaje += `💵 *TOTAL ENVÍO + SERVICIO:* $${COMISION} + Envío%0A`;
-        mensaje += `_Nota: Precio sujeto a espera mayor a 30 min._`;
+        let msg = `*NUEVO PEDIDO - ${servicio.toUpperCase()}*%0A%0A`;
+        msg += `📍 *Origen:* ${ori}%0A`;
+        msg += `📍 *Destino:* ${des}%0A`;
+        msg += `📦 *Detalle:* ${det}%0A`;
+        if(monto) msg += `💰 *Abonar:* $${monto}%0A`;
+        msg += `%0A💵 *Presupuesto base:* ${totalText}`;
 
-        window.open(`https://wa.me/${MI_NUMERO}?text=${mensaje}`, '_blank');
+        window.open(`https://wa.me/${MI_WHATSAPP}?text=${msg}`);
     }
-</script>
 
+    window.onload = function() {
+        initMap();
+        actualizarInterfaz();
+    };
+</script>
 </body>
 </html>
