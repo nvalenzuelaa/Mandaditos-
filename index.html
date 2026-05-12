@@ -130,8 +130,8 @@ function trazar() {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
-            // Precio base 1200 + Km a 350
-            costoEnvio = Math.ceil((1200 + (kms * 350)) / 100) * 100;
+            // Precio base 3000 + Km a 350
+            costoEnvio = Math.ceil((3000 + (kms * 350)) / 100) * 100;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
