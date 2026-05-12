@@ -6,7 +6,7 @@
     <title>Mandaditos App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --brand: #1e40af; } /* Azul más fuerte */
+        :root { --brand: #1e40af; }
         body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
         #map-container { width: 100%; height: 320px; position: relative; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
@@ -102,7 +102,7 @@ function initMap() {
     
     directionsRenderer.setMap(map);
 
-    // PIN A y B casi juntos en el centro
+    // PIN A y B configurados cerca
     markerO = new google.maps.Marker({ 
         position: { lat: -27.3665, lng: -55.8955 }, 
         map, draggable: true, label: "A"
@@ -162,16 +162,21 @@ function enviarWhatsApp() {
     const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
     const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
 
+    // Coordenadas para los links de GPS
+    const latO = markerO.getPosition().lat();
+    const lngO = markerO.getPosition().lng();
+    const latD = markerD.getPosition().lat();
+    const lngD = markerD.getPosition().lng();
+
     let msg = `*COMANDA MOTOMANDADO*%0A%0A`;
-    msg += `🔵 *DATOS DE ENVÍO:*%0A- Nombre: ${nO}%0A- Cel: ${tO}%0A- Dirección: ${dO}%0A%0A`;
-    msg += `🔵 *DATOS DE ENTREGA:*%0A- Nombre: ${nD}%0A- Cel: ${tD}%0A- Dirección: ${dD}%0A%0A`;
+    msg += `🔵 *DATOS DE ENVÍO:*%0A- Nombre: ${nO}%0A- Cel: ${tO}%0A- Dirección: ${dO}%0A📍 *Link GPS Retiro:* https://www.google.com/maps/search/?api=1&query=${latO},${lngO}%0A%0A`;
+    msg += `🔵 *DATOS DE ENTREGA:*%0A- Nombre: ${nD}%0A- Cel: ${tD}%0A- Dirección: ${dD}%0A📍 *Link GPS Entrega:* https://www.google.com/maps/search/?api=1&query=${latD},${lngD}%0A%0A`;
     msg += `📝 *DETALLES:* ${obs}%0A%0A`;
     
     if(hayQuePagar) { msg += `💰 *Abonar en retiro:* $${montoEfectivo}%0A`; }
 
     msg += `💵 *Costo Envío:* $${costoEnvio}%0A`;
-    msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A%0A`;
-    msg += `📍 *Ubicación GPS:* http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+    msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A`;
 
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
