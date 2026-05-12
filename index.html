@@ -33,31 +33,31 @@
     <div class="card">
         <label>¿Qué servicio necesitás?</label>
         <select id="tipo-servicio" onchange="cambiarServicio()">
-            <option value="Envío/Retiro General">Envío o Retiro General</option>
-            <option value="Retiro de Productos/Estudios">Retiro de Productos o Estudios Médicos</option>
-            <option value="Trámite/Pago">Trámites o Pagos</option>
+            <option value="Mandado normal">Mandado normal</option>
+            <option value="Retiro de productos o estudios medicos">Retiro de productos o estudios médicos</option>
+            <option value="Compras">Compras</option>
         </select>
     </div>
 
     <div class="card">
-        <label id="txt-origen">📍 ¿Dónde retiramos?</label>
-        <input id="origen" type="text" placeholder="Calle y altura o lugar">
+        <label id="txt-origen">📍 ¿Dónde retiramos / compramos?</label>
+        <input id="origen" type="text" placeholder="Ej: Supermercado, Farmacia o Calle...">
 
         <label id="txt-destino">📍 ¿Dónde entregamos?</label>
-        <input id="destino" type="text" placeholder="Calle y altura o barrio">
+        <input id="destino" type="text" placeholder="Tu dirección o barrio">
 
-        <label>📦 Detalles del pedido:</label>
-        <textarea id="detalle" rows="3" placeholder="Ej: Dos cajas medianas / Sobre a nombre de..."></textarea>
+        <label id="txt-detalle">📦 Detalles (ser lo más específico posible):</label>
+        <textarea id="detalle" rows="3" placeholder="Ej: Una coca de 2L fría y un paquete de galletitas..."></textarea>
     </div>
 
-    <div id="seccion-productos" class="card hidden">
+    <div id="seccion-pagos" class="card hidden">
         <label>💰 ¿Hay que abonar en el lugar?</label>
         <select id="pago-si-no" onchange="mostrarMonto()">
             <option value="no">No, ya está pago</option>
             <option value="si">Sí, hay que pagar</option>
         </select>
         <div id="caja-monto" class="hidden">
-            <label>Monto a abonar:</label>
+            <label>Monto estimado para la compra/trámite:</label>
             <input id="monto-valor" type="number" placeholder="$ 0.00">
         </div>
     </div>
@@ -72,13 +72,13 @@
 
     <p class="small-print">
         * El precio total varía según la distancia real.<br>
-        * Retiro de productos/estudios tiene un cargo de gestión de $5.000 + envío.<br>
+        * Retiro de productos o compras tienen un cargo de gestión + envío.<br>
         * Esperas mayores a 30 min. tienen recargo.
     </p>
 </div>
 
 <script>
-    const MI_WHATSAPP = "5493764000000"; // CAMBIÁ ESTO POR TU NÚMERO REAL
+    const MI_WHATSAPP = "5493764904731"; 
     let map, marker;
 
     function initMap() {
@@ -89,16 +89,15 @@
 
     function cambiarServicio() {
         const servicio = document.getElementById("tipo-servicio").value;
-        const seccionProd = document.getElementById("seccion-productos");
+        const seccionPagos = document.getElementById("seccion-pagos");
         const totalText = document.getElementById("total-text");
 
-        // Mostrar/Ocultar campos de productos
-        if (servicio === "Retiro de Productos/Estudios") {
-            seccionProd.classList.remove("hidden");
-            totalText.innerText = "$ 5.000 + envío";
+        if (servicio === "Mandado normal") {
+            seccionPagos.classList.add("hidden");
+            totalText.innerText = "$ 1.200 + envío";
         } else {
-            seccionProd.classList.add("hidden");
-            totalText.innerText = (servicio === "Trámite/Pago") ? "$ 3.000 + envío" : "$ 1.200 + envío";
+            seccionPagos.classList.remove("hidden");
+            totalText.innerText = (servicio === "Compras") ? "$ 2.000 + envío" : "$ 5.000 + envío";
         }
     }
 
@@ -119,15 +118,15 @@
         if(!ori || !des || !det) return alert("Por favor, completá los datos.");
 
         let msg = `*NUEVO PEDIDO: ${servicio.toUpperCase()}*%0A%0A`;
-        msg += `📍 *Retiro:* ${ori}%0A`;
+        msg += `📍 *Lugar:* ${ori}%0A`;
         msg += `📍 *Entrega:* ${des}%0A`;
         msg += `📦 *Detalle:* ${det}%0A`;
         
-        if (servicio === "Retiro de Productos/Estudios") {
+        if (servicio !== "Mandado normal") {
             msg += `💰 *Abona en lugar:* ${paga === 'si' ? 'SÍ ($' + monto + ')' : 'NO'}%0A`;
         }
 
-        msg += `%0A💵 *Presupuesto:* ${presupuesto}%0A`;
+        msg += `%0A💵 *Presupuesto base:* ${presupuesto}%0A`;
         msg += `_Nota: Sujeto a espera > 30 min._`;
 
         window.open(`https://wa.me/${MI_WHATSAPP}?text=${msg}`);
