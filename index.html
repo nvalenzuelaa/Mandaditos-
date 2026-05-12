@@ -9,14 +9,15 @@
         :root { --brand: #2563eb; }
         body { background-color: #f8fafc; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
-        #map-container { width: 100%; height: 300px; position: relative; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; margin: 10px 0; }
+        #map-container { width: 100%; height: 300px; position: relative; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
         #map { height: 100%; width: 100%; }
         .input-mini { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 13px; outline: none; background: #f1f5f9; }
         .input-mini:focus { border-color: var(--brand); background: #fff; }
-        .btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 15px; }
+        .btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 15px; margin-bottom: 40px; }
         .precio-box { background: #1e293b; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 15px; }
         .hidden { display: none !important; }
-        .section-title { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .section-card { background: #ffffff; padding: 15px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 15px; }
+        .label-bold { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; }
     </style>
 </head>
 <body onload="initMap()">
@@ -24,7 +25,7 @@
 <div class="app-container shadow-2xl p-4">
     <div class="text-center mb-4">
         <h1 class="text-2xl font-black tracking-tighter text-slate-900 leading-none">Solicitud de Motomandado</h1>
-        <p class="text-slate-400 font-bold text-xs mt-1 italic">Tu moto de confianza 🏍️</p>
+        <p class="text-slate-400 font-bold text-xs mt-1 italic">Servicio Puerta a Puerta 🏍️</p>
     </div>
 
     <div class="space-y-2">
@@ -36,48 +37,43 @@
         <div id="map"></div>
     </div>
 
-    <div class="space-y-5">
-        
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <p class="section-title">👤 Datos de quien envía</p>
-            <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
-            </div>
+    <div class="section-card">
+        <span class="label-bold">👤 Datos del que Envía</span>
+        <div class="grid grid-cols-2 gap-2">
+            <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
+            <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
         </div>
-
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <p class="section-title">📦 Datos de quien recibe</p>
-            <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
-            </div>
-        </div>
-
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <p class="section-title text-center">¿Hay que abonar algo al retirar?</p>
-            <div class="flex justify-center gap-8 font-bold text-slate-700 mt-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO
-                </label>
-            </div>
-            <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="Monto en efectivo $" class="input-mini text-center border-blue-200">
-            </div>
-        </div>
-
-        <textarea id="obs" placeholder="Observaciones (qué llevamos, detalles)..." class="input-mini h-16"></textarea>
     </div>
 
-    <div id="boxPrecio" class="mt-4 hidden">
+    <div class="section-card">
+        <span class="label-bold">📦 Datos del que Recibe</span>
+        <div class="grid grid-cols-2 gap-2">
+            <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
+            <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
+        </div>
+    </div>
+
+    <div class="section-card">
+        <span class="label-bold text-center">¿Hay que abonar algo al retirar?</span>
+        <div class="flex justify-center gap-10 font-bold text-slate-700 my-2">
+            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
+        </div>
+        <div id="boxMonto" class="hidden mt-3">
+            <input id="fMonto" type="number" placeholder="Monto a pagar en el retiro $" class="input-mini text-center border-blue-200">
+        </div>
+        <div class="mt-4">
+            <span class="label-bold">¿Qué llevamos?</span>
+            <textarea id="obs" placeholder="Detalles del paquete u observaciones..." class="input-mini h-20"></textarea>
+        </div>
+    </div>
+
+    <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Total Estimado</p>
+            <p class="text-[10px] uppercase font-bold text-slate-400">Costo del envío</p>
             <p class="text-3xl font-black italic">$<span id="precioTotal">0</span></p>
         </div>
-        <button onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
+        <button onclick="enviarWhatsApp()" class="btn-main">Pedir Motomandado 🚀</button>
     </div>
 </div>
 
@@ -138,6 +134,7 @@ function trazar() {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
+            // FORMULA: 3000 BASE + 350 KM
             costoEnvio = Math.ceil((3000 + (kms * 350)) / 100) * 100;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
@@ -150,24 +147,22 @@ function enviarWhatsApp() {
     const tO = document.getElementById('fTelO').value || "-";
     const nD = document.getElementById('fNombreD').value || "-";
     const tD = document.getElementById('fTelD').value || "-";
-    const dO = document.getElementById('inputO').value || "-";
-    const dD = document.getElementById('inputD').value || "-";
+    const dO = document.getElementById('inputO').value;
+    const dD = document.getElementById('inputD').value;
     const obs = document.getElementById('obs').value || "Ninguna";
     const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
     const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
 
-    let msg = `*COMANDA MANDADITOS*%0A%0A`;
-    msg += `👤 *ENVÍA:* ${nO} (${tO})%0A`;
-    msg += `📍 *Retiro:* ${dO}%0A%0A`;
-    msg += `📦 *RECIBE:* ${nD} (${tD})%0A`;
-    msg += `🏁 *Entrega:* ${dD}%0A%0A`;
-    msg += `📝 *Obs:* ${obs}%0A%0A`;
+    let msg = `*COMANDA MOTOMANDADO*%0A%0A`;
+    msg += `👤 *QUIEN ENVÍA:*%0A- Nombre: ${nO}%0A- WhatsApp: ${tO}%0A- Retiro en: ${dO}%0A%0A`;
+    msg += `📦 *QUIEN RECIBE:*%0A- Nombre: ${nD}%0A- WhatsApp: ${tD}%0A- Entrega en: ${dD}%0A%0A`;
+    msg += `📝 *OBS:* ${obs}%0A%0A`;
     
-    if(hayQuePagar) { msg += `💰 *Abonar en lugar:* $${montoEfectivo}%0A`; }
+    if(hayQuePagar) { msg += `💰 *Abonar en el retiro:* $${montoEfectivo}%0A`; }
 
     msg += `💵 *Costo Envío:* $${costoEnvio}%0A`;
     msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A%0A`;
-    msg += `📍 *Mapa:* https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+    msg += `📍 *Link GPS:* http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
 
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
