@@ -9,11 +9,11 @@
         :root { --brand: #2563eb; }
         body { background-color: #f8fafc; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
-        #map-container { width: 100%; height: 300px; position: relative; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
+        #map-container { width: 100%; height: 320px; position: relative; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
         #map { height: 100%; width: 100%; }
         .input-mini { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 13px; outline: none; background: #f1f5f9; }
         .input-mini:focus { border-color: var(--brand); background: #fff; }
-        .btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 15px; margin-bottom: 40px; }
+        .btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 15px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
         .precio-box { background: #1e293b; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 15px; }
         .hidden { display: none !important; }
         .section-card { background: #ffffff; padding: 15px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 15px; }
@@ -63,8 +63,8 @@
             <input id="fMonto" type="number" placeholder="Monto a pagar en el retiro $" class="input-mini text-center border-blue-200">
         </div>
         <div class="mt-4">
-            <span class="label-bold">¿Qué llevamos?</span>
-            <textarea id="obs" placeholder="Detalles del paquete u observaciones..." class="input-mini h-20"></textarea>
+            <span class="label-bold">¿Qué enviamos?</span>
+            <textarea id="obs" placeholder="Ej: Un sobre, llaves, comida, etc..." class="input-mini h-20"></textarea>
         </div>
     </div>
 
@@ -85,7 +85,9 @@ let costoEnvio = 0;
 
 function initMap() {
     geocoder = new google.maps.Geocoder();
-    const posO = { lat: -27.3670, lng: -55.8961 };
+    // Punto central (Posadas)
+    const centro = { lat: -27.3670, lng: -55.8961 };
+    
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ 
         polylineOptions: { strokeColor: "#2563eb", strokeWeight: 5 }, 
@@ -93,15 +95,30 @@ function initMap() {
     });
     
     map = new google.maps.Map(document.getElementById("map"), { 
-        center: posO, 
+        center: centro, 
         zoom: 14, 
         disableDefaultUI: true, 
         gestureHandling: "greedy" 
     });
     
     directionsRenderer.setMap(map);
-    markerO = new google.maps.Marker({ position: posO, map, draggable: true, label: "A" });
-    markerD = new google.maps.Marker({ position: { lat: -27.38, lng: -55.91 }, map, draggable: true, label: "B" });
+
+    // Marker A y B puestos cerca para que se vean al inicio
+    markerO = new google.maps.Marker({ 
+        position: { lat: -27.365, lng: -55.894 }, 
+        map, 
+        draggable: true, 
+        label: "A",
+        title: "Retiro"
+    });
+    
+    markerD = new google.maps.Marker({ 
+        position: { lat: -27.370, lng: -55.900 }, 
+        map, 
+        draggable: true, 
+        label: "B",
+        title: "Entrega"
+    });
 
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
@@ -147,8 +164,8 @@ function enviarWhatsApp() {
     const tO = document.getElementById('fTelO').value || "-";
     const nD = document.getElementById('fNombreD').value || "-";
     const tD = document.getElementById('fTelD').value || "-";
-    const dO = document.getElementById('inputO').value;
-    const dD = document.getElementById('inputD').value;
+    const dO = document.getElementById('inputO').value || "No especificada";
+    const dD = document.getElementById('inputD').value || "No especificada";
     const obs = document.getElementById('obs').value || "Ninguna";
     const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
     const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
@@ -156,13 +173,13 @@ function enviarWhatsApp() {
     let msg = `*COMANDA MOTOMANDADO*%0A%0A`;
     msg += `👤 *QUIEN ENVÍA:*%0A- Nombre: ${nO}%0A- WhatsApp: ${tO}%0A- Retiro en: ${dO}%0A%0A`;
     msg += `📦 *QUIEN RECIBE:*%0A- Nombre: ${nD}%0A- WhatsApp: ${tD}%0A- Entrega en: ${dD}%0A%0A`;
-    msg += `📝 *OBS:* ${obs}%0A%0A`;
+    msg += `📝 *QUE LLEVAMOS:* ${obs}%0A%0A`;
     
     if(hayQuePagar) { msg += `💰 *Abonar en el retiro:* $${montoEfectivo}%0A`; }
 
     msg += `💵 *Costo Envío:* $${costoEnvio}%0A`;
     msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A%0A`;
-    msg += `📍 *Link GPS:* http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+    msg += `📍 *Link GPS Retiro:* http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
 
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
