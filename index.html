@@ -23,20 +23,24 @@
 <body onload="initMap()">
 
 <div class="app-container shadow-2xl p-4">
+    <!-- Encabezado con Imagen y Eslogan -->
     <div class="text-center mb-4">
-        <h1 class="text-3xl font-black tracking-tighter text-slate-900 leading-none">Mandaditos App</h1>
-        <p class="text-blue-600 font-bold text-xs mt-1 italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
+        <img src="png.png" alt="Mandaditos Logo" class="mx-auto h-28 w-auto mb-1 object-contain">
+        <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div>
 
+    <!-- Buscadores -->
     <div class="space-y-2">
         <input id="inputO" type="text" placeholder="📍 Punto de Retiro (Dirección)" class="input-mini border-blue-200">
         <input id="inputD" type="text" placeholder="🏁 Punto de Entrega (Dirección)" class="input-mini border-blue-200">
     </div>
 
+    <!-- Mapa -->
     <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner">
         <div id="map"></div>
     </div>
 
+    <!-- DATOS DEL QUE ENVÍA -->
     <div class="section-card border-blue-100">
         <span class="label-strong">👤 Datos de quien Envía</span>
         <div class="grid grid-cols-2 gap-2">
@@ -45,6 +49,7 @@
         </div>
     </div>
 
+    <!-- DATOS DEL QUE RECIBE -->
     <div class="section-card border-blue-100">
         <span class="label-strong">📦 Datos de quien Recibe</span>
         <div class="grid grid-cols-2 gap-2">
@@ -53,6 +58,7 @@
         </div>
     </div>
 
+    <!-- PAGO Y OBSERVACIONES -->
     <div class="section-card bg-blue-50 border-blue-200">
         <span class="label-strong text-center border-none">¿Hay que pagar algo al retirar?</span>
         <div class="flex justify-center gap-10 font-black text-slate-800 my-2">
@@ -68,6 +74,7 @@
         </div>
     </div>
 
+    <!-- PRECIO Y BOTÓN -->
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Costo del envío estimado</p>
