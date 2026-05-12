@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandaditos Posadas</title>
+    <!-- Google Maps con Places y Directions -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
     <style>
         :root { --primary: #ffc107; --dark: #212529; --success: #25d366; }
@@ -13,7 +14,7 @@
         .card { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
         input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
-        #map { height: 250px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ddd; background-color: #eee; }
+        #map { height: 250px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 2px solid #ddd; }
         .total-box { background: var(--dark); color: var(--primary); padding: 15px; border-radius: 12px; text-align: center; font-size: 19px; font-weight: bold; }
         .btn-send { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
         .hidden { display: none; }
@@ -26,7 +27,7 @@
 
     <div class="card">
         <label>¿Qué servicio necesitás?</label>
-        <select id="tipo-servicio" onchange="cambiarServicio()">
+        <select id="tipo-servicio" onchange="calcularRuta()">
             <option value="Mandado normal">Mandado normal</option>
             <option value="Retiro de productos o estudios medicos">Retiro de productos o estudios médicos</option>
             <option value="Compras">Compras</option>
@@ -41,7 +42,7 @@
         <input id="destino" type="text" placeholder="Dirección de entrega...">
 
         <label>📦 Detalles específicos:</label>
-        <textarea id="detalle" rows="2" placeholder="Ej: Retirar pedido #123 / Comprar pan..."></textarea>
+        <textarea id="detalle" rows="2" placeholder="Ej: Retirar pedido #123..."></textarea>
     </div>
 
     <div id="seccion-pagos" class="card hidden">
@@ -51,65 +52,76 @@
             <option value="si">Sí</option>
         </select>
         <div id="caja-monto" class="hidden">
-            <label>Monto a abonar:</label>
-            <input id="monto-valor" type="number" placeholder="Monto en $">
+            <input id="monto-valor" type="number" placeholder="¿Cuánto dinero llevamos?">
         </div>
     </div>
 
     <div id="map"></div>
 
     <div class="total-box">
-        Total Estimado: <span id="total-text">$ 1.200</span>
+        Total Estimado: <span id="total-text">$ 0</span>
     </div>
 
-    <button class="btn-send" onclick="enviarPedido()">Enviar Pedido 📲</button>
+    <button class="btn-send" onclick="enviarPedido()">Pedir Mandadito por WhatsApp 📲</button>
 </div>
 
 <script>
     const MI_WHATSAPP = "5493764904731";
-    let map, marker, autocompleteOri, autocompleteDes;
+    let map, directionsService, directionsRenderer, autocompleteOri, autocompleteDes;
 
     function initMap() {
         const posadas = { lat: -27.367, lng: -55.896 };
         map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 14,
+            zoom: 13,
             center: posadas,
+            disableDefaultUI: true
         });
 
-        marker = new google.maps.Marker({
-            map: map,
-            draggable: true,
-            position: posadas
-        });
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
-        autocompleteOri = new google.maps.places.Autocomplete(document.getElementById('origen'));
-        autocompleteDes = new google.maps.places.Autocomplete(document.getElementById('destino'));
+        // Autocompletado limitado a Argentina
+        const options = { componentRestrictions: { country: "ar" } };
+        autocompleteOri = new google.maps.places.Autocomplete(document.getElementById('origen'), options);
+        autocompleteDes = new google.maps.places.Autocomplete(document.getElementById('destino'), options);
 
-        autocompleteOri.addListener('place_changed', function() {
-            const place = autocompleteOri.getPlace();
-            if (place.geometry) {
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-            }
-        });
+        autocompleteOri.addListener('place_changed', calcularRuta);
+        autocompleteDes.addListener('place_changed', calcularRuta);
+    }
 
-        autocompleteDes.addListener('place_changed', function() {
-            const place = autocompleteDes.getPlace();
-            if (place.geometry) {
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
+    function calcularRuta() {
+        const ori = document.getElementById('origen').value;
+        const des = document.getElementById('destino').value;
+        const servicio = document.getElementById("tipo-servicio").value;
+
+        // Mostrar u ocultar sección de pagos según servicio
+        document.getElementById("seccion-pagos").classList.toggle("hidden", servicio === "Mandado normal");
+
+        if (!ori || !des) return;
+
+        directionsService.route({
+            origin: ori,
+            destination: des,
+            travelMode: google.maps.TravelMode.DRIVING
+        }, (response, status) => {
+            if (status === "OK") {
+                directionsRenderer.setDirections(response);
+                const distanciaKm = response.routes[0].legs[0].distance.value / 1000;
+                actualizarPrecio(distanciaKm, servicio);
             }
         });
     }
 
-    function cambiarServicio() {
-        const servicio = document.getElementById("tipo-servicio").value;
-        const totalText = document.getElementById("total-text");
-        document.getElementById("seccion-pagos").classList.toggle("hidden", servicio === "Mandado normal");
-        
-        if (servicio === "Mandado normal") totalText.innerText = "$ 1.200 + envío";
-        else if (servicio === "Compras") totalText.innerText = "$ 2.000 + envío";
-        else totalText.innerText = "$ 5.000 + envío";
+    function actualizarPrecio(km, servicio) {
+        let base = 1200; // Mandado normal base
+        if (servicio === "Compras") base = 2000;
+        if (servicio === "Retiro de productos o estudios medicos") base = 5000;
+
+        // Sumamos $300 por cada kilómetro extra después de los primeros 2km
+        let extraKm = km > 2 ? (km - 2) * 300 : 0;
+        let total = Math.round(base + extraKm);
+
+        document.getElementById("total-text").innerText = `$ ${total.toLocaleString('es-AR')}`;
     }
 
     function mostrarMonto() {
@@ -121,12 +133,18 @@
         const ori = document.getElementById("origen").value;
         const des = document.getElementById("destino").value;
         const det = document.getElementById("detalle").value;
+        const servicio = document.getElementById("tipo-servicio").value;
         const total = document.getElementById("total-text").innerText;
-        const pos = marker.getPosition();
+        const monto = document.getElementById("monto-valor").value;
 
-        if(!ori || !des) return alert("Por favor completá las direcciones.");
+        if (!ori || !des) return alert("Por favor, ingresá las direcciones.");
 
-        let msg = `*NUEVO PEDIDO*%0A📍 *Retiro:* ${ori}%0A📍 *Entrega:* ${des}%0A📦 *Detalles:* ${det}%0A💰 *Total:* ${total}%0A📍 *GPS:* http://google.com/maps?q=${pos.lat()},${pos.lng()}`;
+        let msg = `*NUEVO PEDIDO: ${servicio.toUpperCase()}*%0A%0A`;
+        msg += `📍 *Retiro:* ${ori}%0A`;
+        msg += `📍 *Entrega:* ${des}%0A`;
+        msg += `📦 *Detalles:* ${det}%0A`;
+        if (monto) msg += `💰 *Dinero a llevar:* $${monto}%0A`;
+        msg += `%0A💵 *Precio estimado:* ${total}`;
 
         window.open(`https://wa.me/${MI_WHATSAPP}?text=${msg}`);
     }
