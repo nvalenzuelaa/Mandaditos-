@@ -57,15 +57,19 @@
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
             <p class="section-title text-center">¿Hay que abonar algo al retirar?</p>
             <div class="flex justify-center gap-8 font-bold text-slate-700 mt-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
-                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO
+                </label>
             </div>
             <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="¿Cuánto dinero hay que pagar? $" class="input-mini text-center border-blue-200">
+                <input id="fMonto" type="number" placeholder="Monto en efectivo $" class="input-mini text-center border-blue-200">
             </div>
         </div>
 
-        <textarea id="obs" placeholder="Observaciones adicionales (ej. color de casa, qué llevamos)..." class="input-mini h-16"></textarea>
+        <textarea id="obs" placeholder="Observaciones (qué llevamos, detalles)..." class="input-mini h-16"></textarea>
     </div>
 
     <div id="boxPrecio" class="mt-4 hidden">
@@ -78,6 +82,7 @@
 </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
+
 <script>
 let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
 let costoEnvio = 0;
@@ -90,15 +95,17 @@ function initMap() {
         polylineOptions: { strokeColor: "#2563eb", strokeWeight: 5 }, 
         suppressMarkers: true 
     });
+    
     map = new google.maps.Map(document.getElementById("map"), { 
         center: posO, 
         zoom: 14, 
         disableDefaultUI: true, 
         gestureHandling: "greedy" 
     });
+    
     directionsRenderer.setMap(map);
-    markerO = new google.maps.Marker({ position: posO, map, draggable: true });
-    markerD = new google.maps.Marker({ position: { lat: -27.38, lng: -55.91 }, map, draggable: true });
+    markerO = new google.maps.Marker({ position: posO, map, draggable: true, label: "A" });
+    markerD = new google.maps.Marker({ position: { lat: -27.38, lng: -55.91 }, map, draggable: true, label: "B" });
 
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
@@ -143,11 +150,11 @@ function enviarWhatsApp() {
     const tO = document.getElementById('fTelO').value || "-";
     const nD = document.getElementById('fNombreD').value || "-";
     const tD = document.getElementById('fTelD').value || "-";
-    const dO = document.getElementById('inputO').value;
-    const dD = document.getElementById('inputD').value;
+    const dO = document.getElementById('inputO').value || "-";
+    const dD = document.getElementById('inputD').value || "-";
     const obs = document.getElementById('obs').value || "Ninguna";
     const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
-    const montoEfectivo = hayQuePagar ? parseFloat(document.getElementById('fMonto').value || 0) : 0;
+    const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
 
     let msg = `*COMANDA MANDADITOS*%0A%0A`;
     msg += `👤 *ENVÍA:* ${nO} (${tO})%0A`;
@@ -156,13 +163,11 @@ function enviarWhatsApp() {
     msg += `🏁 *Entrega:* ${dD}%0A%0A`;
     msg += `📝 *Obs:* ${obs}%0A%0A`;
     
-    if(hayQuePagar) {
-        msg += `💰 *Abonar en lugar:* $${montoEfectivo}%0A`;
-    }
+    if(hayQuePagar) { msg += `💰 *Abonar en lugar:* $${montoEfectivo}%0A`; }
 
     msg += `💵 *Costo Envío:* $${costoEnvio}%0A`;
     msg += `⭐ *TOTAL A COBRAR:* $${parseInt(costoEnvio) + parseInt(montoEfectivo)}%0A%0A`;
-    msg += `📍 *Ubicación:* http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+    msg += `📍 *Mapa:* https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
 
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
