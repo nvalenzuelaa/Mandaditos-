@@ -23,15 +23,19 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 .precio-box { background: #0f172a; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; border: 2px solid #334155; }
 .hidden { display: none !important; }
 .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; }
-.label-strong { font-size: 12px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
+.label-strong { font-size: 11px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 6px; display: block; padding-left: 4px; }
 .tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
 .tab-active { background: #1e40af; color: white; }
 .tab-inactive { background: #e2e8f0; color: #64748b; }
-.btn-install { background: #1e40af; color: white; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: none; }
 
-/* Botones de Redes Sociales */
+/* Avisos */
+.aviso-moto { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+.aviso-pago { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+
+/* Redes */
 .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
 .btn-fb { background: #1877F2; color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
+.btn-install { background: #1e40af; color: white; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: none; }
 </style>
 </head>
 <body onload="initMap()"> 
@@ -49,12 +53,19 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámites</button>
     </div> 
 
-    <div class="space-y-2">
-        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini border-blue-200" readonly>
-        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini border-blue-200" readonly>
+    <!-- DIRECCIONES CON TÍTULO ARRIBA -->
+    <div class="space-y-3 px-1">
+        <div>
+            <label class="label-strong">📍 PUNTO DE RETIRO (A)</label>
+            <input id="inputO" type="text" placeholder="Seleccione en el mapa..." class="input-mini border-blue-200" readonly>
+        </div>
+        <div>
+            <label class="label-strong">🏁 PUNTO DE ENTREGA (B)</label>
+            <input id="inputD" type="text" placeholder="Seleccione en el mapa..." class="input-mini border-blue-200" readonly>
+        </div>
     </div> 
 
-    <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner">
+    <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner mt-4">
         <div id="map"></div>
     </div> 
 
@@ -78,7 +89,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <div id="seccionDatosSimples" class="hidden">
         <div class="section-card border-blue-100">
-            <span class="label-strong">👤 Tus Datos</span>
+            <span class="label-strong">👤 Tus Datos de contacto</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreS" type="text" placeholder="Tu Nombre" class="input-mini">
                 <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-mini">
@@ -86,7 +97,16 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         </div>
     </div> 
 
+    <!-- DETALLES Y AVISOS -->
     <div class="section-card bg-blue-50 border-blue-200">
+        <!-- AVISOS RECUPERADOS -->
+        <div id="avisoMoto" class="aviso-moto">
+            ⚠️ AVISO: Solo productos de tamaño chico o mediano.
+        </div>
+        <div id="avisoPagoCompra" class="aviso-pago hidden">
+            💳 IMPORTANTE: Compras se abonan por transferencia antes de salir.
+        </div>
+
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
         <textarea id="obs" placeholder="Ej: Llaves, un sobre..." class="input-mini h-24"></textarea>
         
@@ -111,10 +131,9 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <button onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
     </div>
 
-    <!-- SECCIÓN REDES SOCIALES Y GUARDAR -->
+    <!-- REDES Y GUARDAR -->
     <div class="mt-10 p-2">
         <button onclick="ayudaInstalar()" class="btn-install">📲 GUARDAR APP</button>
-        
         <p class="text-center font-bold text-slate-600 mb-4 text-[12px] uppercase tracking-wider">Seguinos en nuestras redes</p>
         <div class="flex gap-3">
             <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="btn-ig">Instagram</a>
@@ -162,11 +181,8 @@ function trazar() {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
-            
-            // PRECIOS: Envíos base 3000, Compras/Trámites base 4000
             let basePrecio = (tipoServicio === 'envio') ? 3000 : 4000;
             let final = Math.ceil((basePrecio + (kms * 350)) / 100) * 100;
-            
             costoEnvio = final;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
@@ -184,6 +200,10 @@ function setServicio(tipo) {
     document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
     document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
     
+    // Control de Avisos
+    document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
+    document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
+    
     document.getElementById('labelDetalle').innerText = (tipo === 'compra') ? "¿QUÉ COMPRAMOS?" : (tipo === 'tramite') ? "¿QUÉ TRÁMITES HACEMOS?" : "¿QUÉ LLEVAMOS?";
     
     trazar();
@@ -195,7 +215,7 @@ function enviarWhatsApp() {
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
 
-function ayudaInstalar() { alert("Para guardar en el celu:\nEn iPhone: Botón compartir y 'Añadir a pantalla de inicio'.\nEn Android: 3 puntos y 'Instalar aplicación'."); }
+function ayudaInstalar() { alert("Para guardar:\nEn iPhone: Compartir > Añadir a pantalla de inicio.\nEn Android: 3 puntos > Instalar."); }
 </script>
 </body>
 </html>
