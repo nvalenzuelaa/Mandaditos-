@@ -14,13 +14,14 @@
         .input-mini { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 13px; outline: none; background: #f8fafc; }
         .input-mini:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1); }
         .btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4); }
-        .precio-box { background: #0f172a; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 15px; border: 2px solid #334155; }
+        .precio-box { background: #0f172a; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 5px; border: 2px solid #334155; }
         .hidden { display: none !important; }
         .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .label-strong { font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
         .tab-btn { flex: 1; padding: 10px; font-weight: bold; border-radius: 10px; transition: 0.3s; }
         .tab-active { background: #1e40af; color: white; }
         .tab-inactive { background: #e2e8f0; color: #64748b; }
+        .nota-seguridad { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body onload="initMap()">
@@ -50,7 +51,7 @@
         <div id="map"></div>
     </div>
 
-    <!-- SECCIÓN DATOS ENVÍO (Se oculta en compras) -->
+    <!-- SECCIÓN DATOS ENVÍO -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
             <span class="label-strong">👤 Datos del que envía</span>
@@ -68,40 +69,46 @@
         </div>
     </div>
 
-    <!-- SECCIÓN DATOS COMPRA (Solo se ve en compras) -->
+    <!-- SECCIÓN DATOS COMPRA -->
     <div id="seccionDatosCompra" class="hidden">
-        <div class="section-card border-orange-100 bg-orange-50">
-            <span class="label-strong text-orange-700 border-orange-700">👤 Tus Datos</span>
+        <div class="section-card border-blue-100">
+            <span class="label-strong border-blue-700">👤 Tus Datos</span>
             <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreC" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelC" type="tel" placeholder="WhatsApp" class="input-mini">
+                <input id="fNombreC" type="text" placeholder="Tu Nombre" class="input-mini">
+                <input id="fTelC" type="tel" placeholder="Tu WhatsApp" class="input-mini">
             </div>
-            <p class="text-[11px] text-orange-800 mt-3 font-bold">⚠️ Para confirmar la compra necesito una transferencia previa.</p>
         </div>
     </div>
 
     <div class="section-card bg-blue-50 border-blue-200">
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
-        <textarea id="obs" placeholder="Ej: Llaves, sobre, 1kg de pan..." class="input-mini h-24"></textarea>
+        <textarea id="obs" placeholder="Ej: Llaves, sobre, comida..." class="input-mini h-24"></textarea>
+        <p id="notaCarga" class="text-[10px] text-blue-600 mt-2 font-bold hidden">⚠️ Solo productos livianos que entren en mochila/bolsa.</p>
         
-        <div class="mt-4 border-t border-blue-200 pt-4">
-            <span class="label-strong text-center border-none">¿Hay que pagar mercadería?</span>
+        <!-- PAGO MERCADERIA SOLO PARA ENVIO -->
+        <div id="boxPagoMercaderia" class="mt-4 border-t border-blue-200 pt-4">
+            <span class="label-strong text-center border-none">¿Hay que pagar mercadería al retirar?</span>
             <div class="flex justify-center gap-10 font-black text-slate-800 my-2">
                 <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="si" class="w-5 h-5" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
                 <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked class="w-5 h-5" onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
             </div>
             <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="Monto estimado $" class="input-mini text-center border-blue-400 font-bold">
+                <input id="fMonto" type="number" placeholder="Monto a pagar $" class="input-mini text-center border-blue-400 font-bold">
             </div>
         </div>
     </div>
 
     <div id="boxPrecio" class="mt-6 hidden">
+        <!-- MENSAJE DE TRANSFERENCIA PREVIA (SOLO COMPRAS) -->
+        <div id="avisoTransferencia" class="nota-seguridad hidden">
+            🔒 PARA CONFIRMAR LA COMPRA:<br>Es necesario transferir el costo del servicio por adelantado.
+        </div>
+        
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
             <p class="text-4xl font-black italic text-green-400">$<span id="precioTotal">0</span></p>
         </div>
-        <button onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
+        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
     </div>
 </div>
 
@@ -119,19 +126,28 @@ function setServicio(tipo) {
     const sEnvio = document.getElementById('seccionDatosEnvio');
     const sCompra = document.getElementById('seccionDatosCompra');
     const label = document.getElementById('labelDetalle');
+    const bPago = document.getElementById('boxPagoMercaderia');
+    const aviso = document.getElementById('avisoTransferencia');
+    const nota = document.getElementById('notaCarga');
 
     if(tipo === 'compra') {
         btnC.className = "tab-btn tab-active";
         btnE.className = "tab-btn tab-inactive";
         sEnvio.classList.add('hidden');
         sCompra.classList.remove('hidden');
-        label.innerText = "🛒 LISTA DE COMPRAS";
-        document.getElementById('obs').placeholder = "Especifica marcas y cantidades...";
+        bPago.classList.add('hidden');
+        aviso.classList.remove('hidden');
+        nota.classList.remove('hidden');
+        label.innerText = "🛒 LISTA DE COMPRAS (Productos chicos)";
+        document.getElementById('obs').placeholder = "Ej: 1 Leche, pan, remedio de farmacia...";
     } else {
         btnE.className = "tab-btn tab-active";
         btnC.className = "tab-btn tab-inactive";
         sEnvio.classList.remove('hidden');
         sCompra.classList.add('hidden');
+        bPago.classList.remove('hidden');
+        aviso.classList.add('hidden');
+        nota.classList.add('hidden');
         label.innerText = "¿Qué llevamos?";
         document.getElementById('obs').placeholder = "Ej: Llaves, un sobre, comida...";
     }
@@ -191,7 +207,6 @@ function enviarWhatsApp() {
     if(tipoServicio === 'compra') {
         nO = document.getElementById('fNombreC').value || "-";
         tO = document.getElementById('fTelC').value || "-";
-        nD = "CLIENTE"; tD = "-";
     } else {
         nO = document.getElementById('fNombreO').value || "-";
         tO = document.getElementById('fTelO').value || "-";
@@ -202,30 +217,31 @@ function enviarWhatsApp() {
     const dO = document.getElementById('inputO').value || "-";
     const dD = document.getElementById('inputD').value || "-";
     const obs = document.getElementById('obs').value || "-";
-    const hayQuePagar = document.querySelector('input[name="pago"]:checked').value === "si";
+    const hayQuePagar = (tipoServicio === 'envio') ? (document.querySelector('input[name="pago"]:checked').value === "si") : false;
     const montoEfectivo = hayQuePagar ? (document.getElementById('fMonto').value || 0) : 0;
 
     let msg = "*COMANDA MANDADITOS*%0A";
-    msg += "🛠️ SERVICIO: " + (tipoServicio === 'compra' ? "🛒 COMPRA" : "📦 ENVÍO") + "%0A%0A";
-    msg += "*ORIGEN (Retiro/Local):*%0A" + dO + "%0A%0A";
-    msg += "*DESTINO (Entrega):*%0A" + dD + "%0A%0A";
+    msg += "🛠️ TIPO: " + (tipoServicio === 'compra' ? "🛒 COMPRA (Confirmar con Seña)" : "📦 ENVÍO") + "%0A%0A";
+    msg += "*PUNTO A:* " + dO + "%0A";
+    msg += "*PUNTO B:* " + dD + "%0A%0A";
     
     if(tipoServicio === 'compra') {
-        msg += "*DATOS SOLICITANTE:*%0A";
-        msg += "Nombre: " + nO + "%0A";
-        msg += "WhatsApp: " + tO + "%0A%0A";
+        msg += "*CLIENTE:* " + nO + "%0A";
+        msg += "*TELÉFONO:* " + tO + "%0A%0A";
     } else {
         msg += "*DATOS ENVÍO:*%0A";
         msg += "De: " + nO + " (" + tO + ")%0A";
         msg += "Para: " + nD + " (" + tD + ")%0A%0A";
     }
 
-    msg += "*DETALLES / LISTA:*%0A" + obs + "%0A%0A";
-    if(hayQuePagar) msg += "⚠️ *PAGAR EN LOCAL:* $" + montoEfectivo + "%0A";
+    msg += "*DETALLES:* " + obs + "%0A%0A";
+    if(hayQuePagar) msg += "💵 *PAGAR EN ORIGEN:* $" + montoEfectivo + "%0A";
     msg += "💰 *COSTO SERVICIO:* $" + costoEnvio + "%0A";
     msg += "⭐ *TOTAL:* $" + (parseInt(costoEnvio) + parseInt(montoEfectivo)) + "%0A%0A";
-    if(tipoServicio === 'compra') msg += "❗ _Recuerda realizar la transferencia para confirmar la compra._%0A%0A";
-    msg += "📍 GPS: https://www.google.com/maps?q=" + markerO.getPosition().lat() + "," + markerO.getPosition().lng();
+    
+    if(tipoServicio === 'compra') {
+        msg += "⚠️ _Solicito los datos de transferencia para abonar el servicio y confirmar el pedido._";
+    }
 
     window.location.href = "https://api.whatsapp.com/send?phone=543764904731&text=" + msg;
 }
