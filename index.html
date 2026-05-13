@@ -10,7 +10,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="icon" type="image/png" href="png.png"> 
 
+<!-- ÍCONOS EXTERNOS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
 :root { --brand: #1e40af; }
 body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
@@ -24,11 +27,10 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 .hidden { display: none !important; }
 .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; }
 .label-strong { font-size: 11px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 6px; display: block; padding-left: 4px; }
-.tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
+.tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .tab-active { background: #1e40af; color: white; }
 .tab-inactive { background: #e2e8f0; color: #64748b; }
 
-/* Estilos de Avisos y Pasos */
 .instrucciones { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
 .step-item { display: flex; align-items: start; gap: 10px; margin-bottom: 5px; font-size: 12px; color: #1e3a8a; }
 .step-num { background: #1e40af; color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-top: 2px; }
@@ -36,9 +38,12 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 .aviso-moto { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 .aviso-pago { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 
-.btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
-.btn-fb { background: #1877F2; color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
+.btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-fb { background: #1877F2; color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .btn-install { background: #1e40af; color: white; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: none; }
+
+/* Botón GPS */
+.btn-gps { background: #1e40af; color: white; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 </style>
 </head>
 <body onload="initMap()"> 
@@ -51,7 +56,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <!-- PASOS DE USO -->
     <div class="instrucciones shadow-sm">
-        <p class="font-black text-blue-900 mb-2 text-xs uppercase">🚀 ¿Cómo hacer un Mandadito?</p>
+        <p class="font-black text-blue-900 mb-2 text-xs uppercase"><i class="fas fa-rocket mr-1"></i> ¿Cómo hacer un Mandadito?</p>
         <div class="step-item"><div class="step-num">1</div> <p>Elegí el servicio (Envío, Compra o Trámite).</p></div>
         <div class="step-item"><div class="step-num">2</div> <p>Marcá en el mapa los puntos <b>A</b> y <b>B</b>.</p></div>
         <div class="step-item"><div class="step-num">3</div> <p>Completá los datos de contacto y detalles.</p></div>
@@ -60,16 +65,21 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <!-- PESTAÑAS -->
     <div class="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
-        <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Envío</button>
-        <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Compra</button>
-        <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámites</button>
+        <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active"><i class="fas fa-box"></i> Envío</button>
+        <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive"><i class="fas fa-shopping-cart"></i> Compra</button>
+        <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive"><i class="fas fa-file-invoice"></i> Trámites</button>
     </div> 
 
     <!-- DIRECCIONES -->
     <div class="space-y-3 px-1">
         <div>
             <label class="label-strong">📍 PUNTO DE RETIRO (A)</label>
-            <input id="inputO" type="text" placeholder="Mueva el pin 'A'..." class="input-mini border-blue-200">
+            <div class="flex gap-2">
+                <input id="inputO" type="text" placeholder="Mueva el pin 'A'..." class="input-mini border-blue-200">
+                <button onclick="miUbicacion()" class="btn-gps" title="Usar mi ubicación actual">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+            </div>
         </div>
         <div>
             <label class="label-strong">🏁 PUNTO DE ENTREGA (B)</label>
@@ -84,14 +94,14 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
     <!-- SECCIÓN DATOS -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
-            <span class="label-strong">👤 Quien envía</span>
+            <span class="label-strong"><i class="fas fa-user mr-1"></i> Quien envía</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
                 <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
             </div>
         </div>
         <div class="section-card border-blue-100">
-            <span class="label-strong">📦 Quien recibe</span>
+            <span class="label-strong"><i class="fas fa-hand-holding-box mr-1"></i> Quien recibe</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
                 <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
@@ -101,7 +111,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <div id="seccionDatosSimples" class="hidden">
         <div class="section-card border-blue-100">
-            <span class="label-strong">👤 Tus Datos de contacto</span>
+            <span class="label-strong"><i class="fas fa-id-card mr-1"></i> Tus Datos de contacto</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreS" type="text" placeholder="Tu Nombre" class="input-mini">
                 <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-mini">
@@ -111,12 +121,11 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <!-- DETALLES -->
     <div class="section-card bg-blue-50 border-blue-200">
-        <!-- AVISO DE BULTOS PARA ENVÍOS Y COMPRAS -->
         <div id="avisoMoto" class="aviso-moto">
-            ⚠️ AVISO: Solo productos chicos o medianos. NO LLEVAMOS BULTOS GRANDES.
+            <i class="fas fa-exclamation-triangle"></i> AVISO: Solo productos chicos o medianos. NO LLEVAMOS BULTOS GRANDES.
         </div>
         <div id="avisoPagoCompra" class="aviso-pago hidden">
-            💳 IMPORTANTE: El servicio se abona por transferencia antes de salir a comprar.
+            <i class="fas fa-info-circle"></i> IMPORTANTE: El servicio se abona por transferencia antes de salir a comprar.
         </div>
 
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
@@ -140,16 +149,16 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
             <p class="text-4xl font-black italic text-green-400">$<span id="precioTotal">0</span></p>
         </div>
-        <button onclick="enviarWhatsApp()" class="btn-main shadow-lg">Confirmar Pedido 🚀</button>
+        <button onclick="enviarWhatsApp()" class="btn-main shadow-lg"><i class="fab fa-whatsapp mr-2"></i> Confirmar Pedido</button>
     </div>
 
     <!-- REDES -->
     <div class="mt-10 p-2">
-        <button onclick="ayudaInstalar()" class="btn-install">📲 GUARDAR APP</button>
+        <button onclick="ayudaInstalar()" class="btn-install"><i class="fas fa-download"></i> GUARDAR APP</button>
         <p class="text-center font-bold text-slate-600 mb-4 text-[12px] uppercase tracking-wider">Seguinos en nuestras redes</p>
         <div class="flex gap-3">
-            <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="btn-ig">Instagram</a>
-            <a href="https://www.facebook.com/share/1Geoaa3Knd/" target="_blank" class="btn-fb">Facebook</a>
+            <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="btn-ig"><i class="fab fa-instagram"></i> Instagram</a>
+            <a href="https://www.facebook.com/share/1Geoaa3Knd/" target="_blank" class="btn-fb"><i class="fab fa-facebook-f"></i> Facebook</a>
         </div>
     </div>
 </div> 
@@ -181,6 +190,18 @@ function initMap() {
 
     markerO.addListener('dragend', () => { reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
     markerD.addListener('dragend', () => { reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
+}
+
+function miUbicacion() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+            markerO.setPosition(pos);
+            map.setCenter(pos);
+            reverseGeocode(pos, 'inputO');
+            trazar();
+        }, () => { alert("No pudimos acceder a tu ubicación. Por favor, actívala en tu celu."); });
+    }
 }
 
 function reverseGeocode(pos, inputId) {
@@ -217,8 +238,6 @@ function setServicio(tipo) {
     document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
     document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
     document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
-    
-    // El aviso de moto (bultos grandes) sale en Envíos y Compras
     document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
     document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
     
