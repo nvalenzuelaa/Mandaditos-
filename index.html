@@ -12,214 +12,172 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root { 
-    --bg-dark: #0f172a; 
-    --card-bg: #1e293b;
-    --accent: #bef264; /* Verde lima de imagen 1000160282.png */
-    --text-white: #ffffff;
+/* Variables de colores para ambos modos */
+:root {
+    --bg-app: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-color: #1e293b;
+    --input-bg: #f8fafc;
+    --input-border: #cbd5e1;
+    --accent: #1e40af; /* Azul original */
+    --label-color: #1e40af;
 }
 
-body { background-color: var(--bg-dark); color: var(--text-white); font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
-.app-container { max-width: 450px; margin: 0 auto; background: var(--bg-dark); min-height: 100vh; display: flex; flex-direction: column; } 
+/* Clase para el Modo Oscuro inspirado en 1000160282.png */
+.dark-mode {
+    --bg-app: #0f172a;
+    --bg-card: #1e293b;
+    --text-color: #ffffff;
+    --input-bg: #1e293b;
+    --input-border: #475569;
+    --accent: #bef264; /* Verde lima */
+    --label-color: #ffffff;
+}
+
+body { background-color: var(--bg-app); color: var(--text-color); font-size: 13px; font-family: sans-serif; transition: 0.3s; }
+.app-container { max-width: 450px; margin: 0 auto; background: var(--bg-app); min-height: 100vh; } 
 
 .logo-header { height: 120px; width: auto; margin: 10px auto; object-fit: contain; } 
 
-#map-container { width: 100%; height: 320px; position: relative; border: 1px solid #334155; border-radius: 20px; background: #e5e7eb; margin-top: 15px; overflow: hidden; }
+#map-container { width: 100%; height: 300px; border-radius: 20px; margin-top: 15px; overflow: hidden; border: 1px solid var(--input-border); }
 #map { height: 100%; width: 100%; }
 
-/* Estilo para los inputs y textos */
 .input-mini { 
-    width: 100%; padding: 14px; border: 1px solid #475569; border-radius: 12px; 
-    font-size: 13px; outline: none; background: #1e293b; color: #ffffff; 
+    width: 100%; padding: 14px; border: 1px solid var(--input-border); border-radius: 12px; 
+    font-size: 13px; outline: none; background: var(--input-bg); color: var(--text-color); 
 }
-.input-mini::placeholder { color: #94a3b8; }
-.input-mini:focus { border-color: var(--accent); }
 
 .btn-main { 
     background: var(--accent); color: #000; padding: 18px; border-radius: 16px; 
-    font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; 
-    margin-bottom: 40px; box-shadow: 0 4px 20px rgba(190, 242, 100, 0.3); 
+    font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; margin-bottom: 40px;
 }
+/* Si el azul es el activo, el texto del botón debe ser blanco */
+.light-mode-btn { color: white !important; }
 
-.precio-box { background: #000; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; border: 1px solid #334155; }
+.section-card { background: var(--bg-card); padding: 16px; border-radius: 20px; border: 1px solid var(--input-border); margin-top: 15px; }
 
-.section-card { background: var(--card-bg); padding: 16px; border-radius: 20px; border: 1px solid #334155; margin-top: 15px; }
+.label-strong { font-size: 11px; font-weight: 900; color: var(--label-color); text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 3px solid var(--accent); padding-left: 8px; }
 
-/* Etiquetas en blanco para mejor lectura */
-.label-strong { font-size: 11px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 1px; border-left: 3px solid var(--accent); padding-left: 8px; }
-
-.tab-btn { flex: 1; padding: 12px 4px; font-weight: bold; border-radius: 10px; transition: 0.3s; font-size: 12px; border: 1px solid transparent; }
+.tab-btn { flex: 1; padding: 12px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
 .tab-active { background: #2563eb; color: white; }
-.tab-inactive { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+.tab-inactive { background: var(--bg-card); color: #94a3b8; border: 1px solid var(--input-border); }
 
-.instrucciones { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 11px; color: #cbd5e1; }
-.nota-informativa { background: rgba(37, 99, 235, 0.1); border: 1px solid #2563eb; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; }
+/* Botón flotante para cambiar modo */
+.toggle-theme {
+    position: fixed; top: 20px; right: 20px; z-index: 100;
+    background: var(--bg-card); border: 1px solid var(--input-border);
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; font-size: 20px;
+}
 
 .hidden { display: none !important; }
 </style>
 </head>
-<body onload="initMap()"> 
+<body class="dark-mode" onload="initMap()"> <!-- Por defecto inicia en dark como la imagen -->
+
+<div class="toggle-theme" onclick="toggleTheme()" id="themeBtn">☀️</div>
 
 <div id="contenido-app" class="app-container p-4">
     <div class="text-center mb-4">
         <img src="png.png" alt="Logo" class="logo-header">
-        <p class="text-blue-400 font-bold text-[10px] uppercase tracking-[3px]">Tu moto de confianza 🏍️</p>
+        <p id="subtitulo" class="text-blue-400 font-bold text-[10px] uppercase tracking-[3px]">Tu moto de confianza 🏍️</p>
     </div> 
 
-    <div class="instrucciones">
-        <p>¿Cómo pedir? 1. Elegí servicio. 2. Marcá puntos en el mapa. 3. ¡Listo!</p>
-    </div> 
-
-    <div class="flex gap-2 mb-4 bg-slate-900/50 p-1 rounded-xl">
+    <div class="flex gap-2 mb-4 p-1 rounded-xl">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Envío</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Compra</button>
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámite</button>
     </div> 
 
-    <div id="avisoTramiteInfo" class="nota-informativa hidden">
-        💡 Retiro de estudios médicos, pagos de boletas o mercadería ya pagada.
-    </div> 
-
     <div class="space-y-3">
-        <div class="relative">
-            <span class="absolute left-3 top-3.5">📍</span>
-            <input id="inputO" type="text" placeholder="Punto de retiro" class="input-mini pl-10">
-        </div>
-        <div class="relative">
-            <span class="absolute left-3 top-3.5">🏁</span>
-            <input id="inputD" type="text" placeholder="Punto de entrega" class="input-mini pl-10">
-        </div>
+        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini">
+        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini">
     </div> 
 
     <div id="map-container">
         <div id="map"></div>
     </div> 
 
-    <div id="seccionDatosEnvio">
-        <div class="section-card">
-            <span class="label-strong">👤 Quien envía</span>
-            <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
-            </div>
+    <div id="seccionDatosEnvio" class="section-card">
+        <span class="label-strong">👤 Contactos</span>
+        <div class="grid grid-cols-2 gap-2">
+            <input id="fNombreO" type="text" placeholder="Nombre Envía" class="input-mini">
+            <input id="fNombreD" type="text" placeholder="Nombre Recibe" class="input-mini">
         </div>
-        <div class="section-card">
-            <span class="label-strong">📦 Quien recibe</span>
-            <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
-            </div>
-        </div>
-    </div> 
-
-    <div id="seccionDatosSimples" class="hidden">
-        <div class="section-card">
-            <span class="label-strong">👤 Tus Datos</span>
-            <div class="grid grid-cols-2 gap-2">
-                <input id="fNombreS" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelS" type="tel" placeholder="WhatsApp" class="input-mini">
-            </div>
-        </div>
-    </div> 
+    </div>
 
     <div class="section-card">
         <span id="labelDetalle" class="label-strong">¿Qué llevamos?</span>
-        <textarea id="obs" placeholder="Ej: Llaves, sobre, comida..." class="input-mini h-24"></textarea>
-        
-        <div id="boxPagoMercaderia" class="mt-4 border-t border-slate-700 pt-4">
-            <span class="label-strong text-center block w-full border-none">¿Pagamos mercadería al retirar?</span>
-            <div class="flex justify-center gap-10 font-black text-white my-2">
-                <label class="flex items-center gap-2"><input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
-                <label class="flex items-center gap-2"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
-            </div>
-            <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="Monto a pagar $" class="input-mini text-center border-blue-500">
-            </div>
-        </div>
+        <textarea id="obs" placeholder="Ej: Llaves, sobre..." class="input-mini h-20"></textarea>
     </div> 
 
     <div id="boxPrecio" class="mt-6 hidden">
-        <div class="precio-box">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Total estimado</p>
-            <p class="text-4xl font-black italic text-white">$<span id="precioTotal">0</span></p>
+        <div class="bg-black text-white p-4 rounded-2xl text-center mb-2 border border-slate-700">
+            <p class="text-[10px] uppercase text-slate-400">Total del servicio</p>
+            <p class="text-4xl font-black italic">$<span id="precioTotal">0</span></p>
         </div>
-        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Confirmar por WhatsApp 🚀</button>
+        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
     </div>
 </div> 
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script> 
 
 <script>
+let isDarkMode = true;
 let tipoServicio = 'envio';
-const RECARGO_ESPECIAL = 5000;
-let costoEnvio = 0; 
+let costoEnvio = 0;
+
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('themeBtn');
+    const finalBtn = document.getElementById('btnFinal');
+    
+    isDarkMode = !isDarkMode;
+    
+    if(isDarkMode) {
+        body.classList.add('dark-mode');
+        btn.innerText = "☀️";
+        finalBtn.classList.remove('light-mode-btn');
+    } else {
+        body.classList.remove('dark-mode');
+        btn.innerText = "🌙";
+        finalBtn.classList.add('light-mode-btn');
+    }
+}
 
 function setServicio(tipo) {
     tipoServicio = tipo;
-    const tabs = ['btnEnvio', 'btnCompra', 'btnTramite'];
-    tabs.forEach(t => {
-        const el = document.getElementById(t);
-        el.className = (t === 'btn' + tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive";
+    ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(t => {
+        document.getElementById(t).className = (t === 'btn' + tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive";
     });
-
-    document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
-    document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
-    document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
-    document.getElementById('avisoTramiteInfo').classList.toggle('hidden', tipo !== 'tramite');
     
     const label = document.getElementById('labelDetalle');
-    const textArea = document.getElementById('obs');
-
-    if(tipo === 'compra') {
-        label.innerText = "¿QUÉ COMPRAMOS?";
-        textArea.placeholder = "Ej: 1 Leche, pan, remedio...";
-    } else if (tipo === 'tramite') {
-        label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
-        textArea.placeholder = "Ej: Retirar estudio, pagar boleta...";
-    } else {
-        label.innerText = "¿QUÉ LLEVAMOS?";
-        textArea.placeholder = "Ej: Llaves, sobre, comida...";
-    }
+    if(tipo === 'compra') label.innerText = "¿QUÉ COMPRAMOS?";
+    else if (tipo === 'tramite') label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
+    else label.innerText = "¿QUÉ LLEVAMOS?";
+    
     if(costoEnvio > 0) trazar();
 }
 
-let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
+let map, directionsService, directionsRenderer, markerO, markerD;
 
 function initMap() {
-    geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({ 
-        polylineOptions: { strokeColor: "#2563eb", strokeWeight: 6 }, 
-        suppressMarkers: true 
-    });
-    
-    map = new google.maps.Map(document.getElementById("map"), { 
-        center: { lat: -27.3670, lng: -55.8961 }, 
-        zoom: 15, 
-        disableDefaultUI: true
-    });
-
+    directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+    map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 15, disableDefaultUI: true });
     directionsRenderer.setMap(map);
+
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
     markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
-    
+
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
     
-    autoO.addListener('place_changed', () => { const p = autoO.getPlace(); if(p.geometry) { markerO.setPosition(p.geometry.location); map.setCenter(p.geometry.location); trazar(); } });
-    autoD.addListener('place_changed', () => { const p = autoD.getPlace(); if(p.geometry) { markerD.setPosition(p.geometry.location); trazar(); } });
-    markerO.addListener('dragend', () => reverseGeocode(markerO.getPosition(), 'O'));
-    markerD.addListener('dragend', () => reverseGeocode(markerD.getPosition(), 'D'));
-}
-
-function reverseGeocode(pos, type) {
-    geocoder.geocode({ location: pos }, (res, stat) => {
-        if (stat === "OK" && res[0]) {
-            if (type === 'O') document.getElementById('inputO').value = res[0].formatted_address;
-            else document.getElementById('inputD').value = res[0].formatted_address;
-            trazar();
-        }
-    });
+    autoO.addListener('place_changed', () => { markerO.setPosition(autoO.getPlace().geometry.location); trazar(); });
+    autoD.addListener('place_changed', () => { markerD.setPosition(autoD.getPlace().geometry.location); trazar(); });
+    
+    markerO.addListener('dragend', trazar);
+    markerD.addListener('dragend', trazar);
 }
 
 function trazar() {
@@ -227,8 +185,8 @@ function trazar() {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
-            let base = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            costoEnvio = (tipoServicio !== 'envio') ? (base + RECARGO_ESPECIAL) : base;
+            costoEnvio = Math.ceil((3000 + (kms * 350)) / 100) * 100;
+            if(tipoServicio !== 'envio') costoEnvio += 5000;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
@@ -236,22 +194,9 @@ function trazar() {
 }
 
 function enviarWhatsApp() {
-    let dO = document.getElementById('inputO').value;
-    let dD = document.getElementById('inputD').value;
-    let obs = document.getElementById('obs').value;
-    
-    let datosC = "";
-    if(tipoServicio === 'envio') {
-        datosC = `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value}%0ARecibe: ${document.getElementById('fNombreD').value}`;
-    } else {
-        datosC = `*CLIENTE:* ${document.getElementById('fNombreS').value}`;
-    }
-
     let msg = `COMANDA MANDADITOS%0A🛠️ SERVICIO: ${tipoServicio.toUpperCase()}%0A%0A`;
-    msg += `📍 RETIRO: ${dO}%0A🏁 ENTREGA: ${dD}%0A%0A`;
-    msg += `${datosC}%0A%0A📝 DETALLE: ${obs}%0A%0A`;
-    msg += `⭐ COSTO ENVÍO: $${costoEnvio}`;
-    
+    msg += `📍 RETIRO: ${document.getElementById('inputO').value}%0A🏁 ENTREGA: ${document.getElementById('inputD').value}%0A%0A`;
+    msg += `📝 DETALLE: ${document.getElementById('obs').value}%0A%0A⭐ TOTAL: $${costoEnvio}`;
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
 </script>
