@@ -42,32 +42,27 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div> 
 
-    <!-- PASOS PARA PEDIR -->
     <div class="instrucciones">
         <p><strong>¿Cómo pedir?</strong><br>
-        1️⃣ Elegí el tipo de servicio.<br>
-        2️⃣ Marcá los puntos A y B en el mapa.<br>
-        3️⃣ Completá los datos y confirmá por WhatsApp.</p>
+        1️⃣ Elegí el servicio 2️⃣ Ubicá A y B 3️⃣ Confirmá</p>
     </div>
 
-    <!-- PESTAÑAS -->
+    <!-- PESTAÑAS (TRÁMITES EN PLURAL) -->
     <div class="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Envío</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Compra</button>
-        <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámite</button>
+        <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámites</button>
     </div> 
 
-    <!-- DIRECCIONES -->
     <div class="space-y-2">
-        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini border-blue-200">
-        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini border-blue-200">
+        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini border-blue-200" readonly>
+        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini border-blue-200" readonly>
     </div> 
 
     <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner">
         <div id="map"></div>
     </div> 
 
-    <!-- SECCIÓN DATOS -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
             <span class="label-strong">👤 Quien envía</span>
@@ -87,7 +82,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <div id="seccionDatosSimples" class="hidden">
         <div class="section-card border-blue-100">
-            <span class="label-strong">👤 Tus Datos de contacto</span>
+            <span class="label-strong">👤 Tus Datos</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreS" type="text" placeholder="Tu Nombre" class="input-mini">
                 <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-mini">
@@ -95,18 +90,15 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         </div>
     </div> 
 
-    <!-- DETALLES Y AVISOS -->
     <div class="section-card bg-blue-50 border-blue-200">
         <div id="avisoMoto" class="aviso-moto">
-            ⚠️ AVISO: Solo productos de tamaño chico o mediano. No llevamos bultos grandes.
+            ⚠️ AVISO: Solo productos de tamaño chico o mediano.
         </div>
-
         <div id="avisoPagoCompra" class="aviso-pago hidden">
-            💳 IMPORTANTE: Para compras, se abona el servicio por transferencia antes de salir.
+            💳 IMPORTANTE: Compras se abonan por transferencia antes de salir.
         </div>
-
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
-        <textarea id="obs" placeholder="Ej: Llaves, un sobre, comida, ropa..." class="input-mini h-24"></textarea>
+        <textarea id="obs" placeholder="Ej: Llaves, un sobre..." class="input-mini h-24"></textarea>
         
         <div id="boxPagoMercaderia" class="mt-4 border-t border-blue-200 pt-4">
             <span class="label-strong text-center border-none text-[10px]">¿Hay que pagar mercadería al retirar?</span>
@@ -120,29 +112,19 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         </div>
     </div> 
 
-    <!-- PRECIO Y BOTÓN FINAL -->
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
             <p class="text-4xl font-black italic text-green-400">$<span id="precioTotal">0</span></p>
         </div>
-        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
+        <button onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
     </div>
 
-    <!-- SECCIÓN INSTALAR Y REDES -->
     <div class="mt-10 p-2">
-        <button onclick="ayudaInstalar()" class="btn-install">
-            📲 GUARDAR COMO APLICACIÓN
-        </button>
-        
-        <p class="text-center font-bold text-blue-800 mb-3 text-[11px] uppercase tracking-wider">Seguinos en nuestras redes</p>
+        <button onclick="ayudaInstalar()" class="btn-install">📲 GUARDAR APP</button>
         <div class="flex gap-3">
-            <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="social-link">
-                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="16"> Instagram
-            </a>
-            <a href="https://www.facebook.com/share/1Geoaa3Knd/" target="_blank" class="social-link">
-                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="16"> Facebook
-            </a>
+            <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="social-link">Instagram</a>
+            <a href="https://www.facebook.com/share/1Geoaa3Knd/" target="_blank" class="social-link">Facebook</a>
         </div>
     </div>
 </div> 
@@ -152,61 +134,35 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 <script>
 let tipoServicio = 'envio';
 let costoEnvio = 0;
-
-function ayudaInstalar() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if(isIOS) {
-        alert("Para instalar en iPhone:\n1. Toca el botón 'Compartir' (el cuadrado con flechita arriba).\n2. Selecciona 'Añadir a pantalla de inicio'.\n¡Y listo! Ya aparecerá el logo en tu menú.");
-    } else {
-        alert("Para instalar en Android:\n1. Toca los 3 puntos arriba a la derecha.\n2. Toca 'Instalar aplicación' o 'Añadir a pantalla de inicio'.\n¡Listo! Ya nos tendrás en tu menú.");
-    }
-}
-
-function setServicio(tipo) {
-    tipoServicio = tipo;
-    ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(t => {
-        document.getElementById(t).className = (t === 'btn' + tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive";
-    });
-
-    document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
-    document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
-    document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
-    document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
-    document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
-
-    const label = document.getElementById('labelDetalle');
-    const textArea = document.getElementById('obs');
-
-    if(tipo === 'compra') {
-        label.innerText = "¿QUÉ COMPRAMOS?";
-        textArea.placeholder = "Ej: 1kg pan, leche, gaseosa, remedios...";
-    } else if (tipo === 'tramite') {
-        label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
-        textArea.placeholder = "Ej: Retirar documentos, estudios médicos...";
-    } else {
-        label.innerText = "¿QUÉ LLEVAMOS?";
-        textArea.placeholder = "Ej: Llaves, un sobre, comida, ropa...";
-    }
-    if(costoEnvio > 0) trazar();
-}
-
-let map, directionsService, directionsRenderer, markerO, markerD;
+let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
 
 function initMap() {
+    geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#1e40af", strokeWeight: 6 }, suppressMarkers: true });
+    
     map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 15, disableDefaultUI: true });
     directionsRenderer.setMap(map);
+
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
     markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
-    
-    const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
-    const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
-    
-    autoO.addListener('place_changed', () => { markerO.setPosition(autoO.getPlace().geometry.location); trazar(); });
-    autoD.addListener('place_changed', () => { markerD.setPosition(autoD.getPlace().geometry.location); trazar(); });
-    markerO.addListener('dragend', trazar);
-    markerD.addListener('dragend', trazar);
+
+    // Actualizar dirección al soltar marcadores
+    markerO.addListener('dragend', () => { reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
+    markerD.addListener('dragend', () => { reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
+
+    // Dirección inicial
+    reverseGeocode(markerO.getPosition(), 'inputO');
+    reverseGeocode(markerD.getPosition(), 'inputD');
+    trazar();
+}
+
+function reverseGeocode(pos, inputId) {
+    geocoder.geocode({ location: pos }, (results, status) => {
+        if (status === "OK" && results[0]) {
+            document.getElementById(inputId).value = results[0].formatted_address;
+        }
+    });
 }
 
 function trazar() {
@@ -215,36 +171,36 @@ function trazar() {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
             let base = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            costoEnvio = (tipoServicio !== 'envio') ? (base + 4000) : base;
+            costoEnvio = (tipoServicio !== 'envio') ? (base + 3000) : base;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
     });
 }
 
+function setServicio(tipo) {
+    tipoServicio = tipo;
+    ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(t => {
+        document.getElementById(t).className = (t === 'btn' + tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive";
+    });
+    document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
+    document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
+    document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
+    document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
+    document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
+    
+    document.getElementById('labelDetalle').innerText = (tipo === 'compra') ? "¿QUÉ COMPRAMOS?" : (tipo === 'tramite') ? "¿QUÉ TRÁMITES HACEMOS?" : "¿QUÉ LLEVAMOS?";
+    
+    if(costoEnvio > 0) trazar();
+}
+
 function enviarWhatsApp() {
-    let datos = "";
-    if(tipoServicio === 'envio') {
-        datos = `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value}%0ARecibe: ${document.getElementById('fNombreD').value}`;
-    } else {
-        datos = `*CLIENTE:* ${document.getElementById('fNombreS').value} (${document.getElementById('fTelS').value})`;
-    }
-
-    let msg = `*MANDADITOS: ${tipoServicio.toUpperCase()}*%0A%0A`;
-    msg += `📍 *Retiro:* ${document.getElementById('inputO').value}%0A`;
-    msg += `🏁 *Entrega:* ${document.getElementById('inputD').value}%0A%0A`;
-    msg += `${datos}%0A%0A`;
-    msg += `📝 *DETALLE:* ${document.getElementById('obs').value}%0A`;
-    
-    if(tipoServicio === 'envio' && document.querySelector('input[name="pago"]:checked').value === "si") {
-        msg += `💵 *PAGAR ALLÍ:* $${document.getElementById('fMonto').value}%0A`;
-    }
-    
-    if(tipoServicio === 'compra') msg += `%0A⚠️ *NOTA:* Requiere transferencia previa del servicio.%0A`;
-
-    msg += `%0A⭐ *COSTO ENVÍO:* $${costoEnvio}`;
+    let datos = (tipoServicio === 'envio') ? `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value}%0ARecibe: ${document.getElementById('fNombreD').value}` : `*CLIENTE:* ${document.getElementById('fNombreS').value} (${document.getElementById('fTelS').value})`;
+    let msg = `*MANDADITOS: ${tipoServicio.toUpperCase()}S*%0A%0A📍 *Retiro:* ${document.getElementById('inputO').value}%0A🏁 *Entrega:* ${document.getElementById('inputD').value}%0A%0A${datos}%0A%0A📝 *DETALLE:* ${document.getElementById('obs').value}%0A%0A⭐ *COSTO ENVÍO:* $${costoEnvio}`;
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
+
+function ayudaInstalar() { alert("Para guardar: En iPhone usa 'Añadir a pantalla de inicio' en el botón Compartir. En Android usa 'Instalar' en los 3 puntos."); }
 </script>
 </body>
 </html>
