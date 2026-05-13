@@ -15,23 +15,25 @@
 :root { 
     --bg-dark: #0f172a; 
     --card-bg: #1e293b;
-    --accent: #bef264; /* El verde lima de la imagen */
-    --text-main: #f8fafc;
+    --accent: #bef264; /* Verde lima de imagen 1000160282.png */
+    --text-white: #ffffff;
 }
 
-body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
+body { background-color: var(--bg-dark); color: var(--text-white); font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
 .app-container { max-width: 450px; margin: 0 auto; background: var(--bg-dark); min-height: 100vh; display: flex; flex-direction: column; } 
 
 .logo-header { height: 120px; width: auto; margin: 10px auto; object-fit: contain; } 
 
-#map-container { width: 100%; height: 320px; position: relative; border: 1px solid #334155; border-radius: 20px; background: #000; margin-top: 15px; overflow: hidden; }
+#map-container { width: 100%; height: 320px; position: relative; border: 1px solid #334155; border-radius: 20px; background: #e5e7eb; margin-top: 15px; overflow: hidden; }
 #map { height: 100%; width: 100%; }
 
+/* Estilo para los inputs y textos */
 .input-mini { 
-    width: 100%; padding: 14px; border: 1px solid #334155; border-radius: 12px; 
-    font-size: 13px; outline: none; background: #1e293b; color: white; 
+    width: 100%; padding: 14px; border: 1px solid #475569; border-radius: 12px; 
+    font-size: 13px; outline: none; background: #1e293b; color: #ffffff; 
 }
-.input-mini:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(190, 242, 100, 0.1); }
+.input-mini::placeholder { color: #94a3b8; }
+.input-mini:focus { border-color: var(--accent); }
 
 .btn-main { 
     background: var(--accent); color: #000; padding: 18px; border-radius: 16px; 
@@ -43,14 +45,15 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13p
 
 .section-card { background: var(--card-bg); padding: 16px; border-radius: 20px; border: 1px solid #334155; margin-top: 15px; }
 
-.label-strong { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 1px; }
+/* Etiquetas en blanco para mejor lectura */
+.label-strong { font-size: 11px; font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 1px; border-left: 3px solid var(--accent); padding-left: 8px; }
 
 .tab-btn { flex: 1; padding: 12px 4px; font-weight: bold; border-radius: 10px; transition: 0.3s; font-size: 12px; border: 1px solid transparent; }
-.tab-active { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4); }
-.tab-inactive { background: #1e293b; color: #94a3b8; border-color: #334155; }
+.tab-active { background: #2563eb; color: white; }
+.tab-inactive { background: #1e293b; color: #cbd5e1; border-color: #334155; }
 
-.instrucciones { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 11px; color: #94a3b8; }
-.nota-informativa { background: rgba(37, 99, 235, 0.1); border: 1px solid #2563eb; color: #60a5fa; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; }
+.instrucciones { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 11px; color: #cbd5e1; }
+.nota-informativa { background: rgba(37, 99, 235, 0.1); border: 1px solid #2563eb; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; }
 
 .hidden { display: none !important; }
 </style>
@@ -64,7 +67,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13p
     </div> 
 
     <div class="instrucciones">
-        <p>¿Cómo pedir? 1. Elegí servicio. 2. Marcá puntos. 3. ¡Listo!</p>
+        <p>¿Cómo pedir? 1. Elegí servicio. 2. Marcá puntos en el mapa. 3. ¡Listo!</p>
     </div> 
 
     <div class="flex gap-2 mb-4 bg-slate-900/50 p-1 rounded-xl">
@@ -79,11 +82,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13p
 
     <div class="space-y-3">
         <div class="relative">
-            <span class="absolute left-3 top-3.5 text-red-500">📍</span>
+            <span class="absolute left-3 top-3.5">📍</span>
             <input id="inputO" type="text" placeholder="Punto de retiro" class="input-mini pl-10">
         </div>
         <div class="relative">
-            <span class="absolute left-3 top-3.5 text-blue-500">🏁</span>
+            <span class="absolute left-3 top-3.5">🏁</span>
             <input id="inputD" type="text" placeholder="Punto de entrega" class="input-mini pl-10">
         </div>
     </div> 
@@ -92,7 +95,6 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13p
         <div id="map"></div>
     </div> 
 
-    <!-- SECCIÓN DATOS -->
     <div id="seccionDatosEnvio">
         <div class="section-card">
             <span class="label-strong">👤 Quien envía</span>
@@ -125,7 +127,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); font-size: 13p
         <textarea id="obs" placeholder="Ej: Llaves, sobre, comida..." class="input-mini h-24"></textarea>
         
         <div id="boxPagoMercaderia" class="mt-4 border-t border-slate-700 pt-4">
-            <span class="label-strong text-center block w-full">¿Pagamos mercadería al retirar?</span>
+            <span class="label-strong text-center block w-full border-none">¿Pagamos mercadería al retirar?</span>
             <div class="flex justify-center gap-10 font-black text-white my-2">
                 <label class="flex items-center gap-2"><input type="radio" name="pago" value="si" onclick="document.getElementById('boxMonto').classList.remove('hidden')"> SÍ</label>
                 <label class="flex items-center gap-2"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
@@ -187,20 +189,14 @@ function initMap() {
     geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ 
-        polylineOptions: { strokeColor: "#3b82f6", strokeWeight: 6 }, 
+        polylineOptions: { strokeColor: "#2563eb", strokeWeight: 6 }, 
         suppressMarkers: true 
     });
     
     map = new google.maps.Map(document.getElementById("map"), { 
         center: { lat: -27.3670, lng: -55.8961 }, 
         zoom: 15, 
-        disableDefaultUI: true,
-        styles: [
-            { "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] },
-            { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] },
-            { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] },
-            { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }
-        ]
+        disableDefaultUI: true
     });
 
     directionsRenderer.setMap(map);
@@ -240,6 +236,10 @@ function trazar() {
 }
 
 function enviarWhatsApp() {
+    let dO = document.getElementById('inputO').value;
+    let dD = document.getElementById('inputD').value;
+    let obs = document.getElementById('obs').value;
+    
     let datosC = "";
     if(tipoServicio === 'envio') {
         datosC = `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value}%0ARecibe: ${document.getElementById('fNombreD').value}`;
@@ -248,8 +248,8 @@ function enviarWhatsApp() {
     }
 
     let msg = `COMANDA MANDADITOS%0A🛠️ SERVICIO: ${tipoServicio.toUpperCase()}%0A%0A`;
-    msg += `📍 RETIRO: ${document.getElementById('inputO').value}%0A🏁 ENTREGA: ${document.getElementById('inputD').value}%0A%0A`;
-    msg += `${datosC}%0A%0A📝 DETALLE: ${document.getElementById('obs').value}%0A%0A`;
+    msg += `📍 RETIRO: ${dO}%0A🏁 ENTREGA: ${dD}%0A%0A`;
+    msg += `${datosC}%0A%0A📝 DETALLE: ${obs}%0A%0A`;
     msg += `⭐ COSTO ENVÍO: $${costoEnvio}`;
     
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
