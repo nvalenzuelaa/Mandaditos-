@@ -4,11 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mandaditos App</title>
+    
+    <!-- Configuración para que aparezca como Icono en el celular -->
+    <link rel="apple-touch-icon" href="png.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="icon" type="image/png" href="png.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --brand: #1e40af; }
         body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* LOGO MÁS GRANDE */
+        .logo-header { 
+            height: 140px; /* Aumentado de 112px a 140px */
+            width: auto; 
+            margin: 10px auto;
+            object-contain: contain;
+        }
+
         #map-container { width: 100%; height: 320px; position: relative; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
         #map { height: 100%; width: 100%; }
         .input-mini { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 13px; outline: none; background: #f8fafc; }
@@ -29,19 +45,18 @@
 <body onload="initMap()">
 
 <div id="pantalla-cerrado" class="hidden fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center text-center p-8">
-    <img src="png.png" alt="Logo" class="h-32 mb-6 object-contain">
+    <img src="png.png" alt="Logo" class="h-40 mb-6 object-contain">
     <h2 class="text-xl font-bold text-slate-700">En este momento no estoy trabajando 😴</h2>
 </div>
 
 <div id="contenido-app" class="app-container shadow-2xl p-4">
-    <div class="text-center mb-4">
-        <img src="png.png" alt="Mandaditos Logo" class="mx-auto h-28 w-auto mb-1 object-contain">
+    <div class="text-center mb-2">
+        <img src="png.png" alt="Mandaditos Logo" class="logo-header">
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div>
 
-    <!-- MINI INSTRUCCIONES -->
     <div class="instrucciones">
-        <p><strong>¿Cómo pedir?</strong> 1. Elegí el servicio. 2. Marcá los puntos en el mapa o escribí las direcciones. 3. ¡Listo! Abajo verás el precio final.</p>
+        <p><strong>¿Cómo pedir?</strong> 1. Elegí el servicio. 2. Marcá los puntos en el mapa. 3. ¡Listo! Abajo verás el precio final.</p>
     </div>
 
     <div class="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
@@ -50,7 +65,6 @@
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámite</button>
     </div>
 
-    <!-- AVISO TRÁMITES -->
     <div id="avisoTramiteInfo" class="nota-informativa hidden">
         <strong>💡 ¿Qué puedes pedir aquí?</strong><br>
         Usa esta sección para retirar compras ya pagadas, estudios médicos, documentos, etc.
@@ -126,7 +140,7 @@
 <script>
 const ESTADO_APP = "ON"; 
 let tipoServicio = 'envio';
-const RECARGO_ESPECIAL = 5000; // Tanto para Compra como para Trámite
+const RECARGO_ESPECIAL = 5000;
 
 function setServicio(tipo) {
     tipoServicio = tipo;
@@ -204,10 +218,7 @@ function trazar() {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
             let base = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            
-            // Si es compra o tramite, lleva el mismo recargo de 5000
             costoEnvio = (tipoServicio !== 'envio') ? (base + RECARGO_ESPECIAL) : base;
-
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
@@ -240,15 +251,11 @@ function enviarWhatsApp() {
     msg += "*PUNTO B (Entrega):*%0A" + dD + "%0A%0A";
     msg += datosCliente + "%0A%0A";
     msg += "*DETALLES:* " + obs + "%0A%0A";
-    
     if(hayQuePagar) msg += "💵 *PAGAR EN ORIGEN:* $" + montoEfectivo + "%0A";
     msg += "💰 *COSTO SERVICIO:* $" + costoEnvio + "%0A";
     msg += "⭐ *TOTAL:* $" + (parseInt(costoEnvio) + parseInt(montoEfectivo)) + "%0A%0A";
-    
     if(tipoServicio !== 'envio') msg += "⚠️ _Requiere transferencia del servicio para confirmar._";
-    
     msg += "%0A📍 GPS: https://www.google.com/maps?q=" + markerO.getPosition().lat() + "," + markerO.getPosition().lng();
-
     window.location.href = "https://api.whatsapp.com/send?phone=543764904731&text=" + msg;
 }
 </script>
