@@ -12,34 +12,32 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-/* Variables de colores para ambos modos */
 :root {
     --bg-app: #f1f5f9;
     --bg-card: #ffffff;
     --text-color: #1e293b;
     --input-bg: #f8fafc;
     --input-border: #cbd5e1;
-    --accent: #1e40af; /* Azul original */
+    --accent: #1e40af; 
     --label-color: #1e40af;
 }
 
-/* Clase para el Modo Oscuro inspirado en 1000160282.png */
 .dark-mode {
     --bg-app: #0f172a;
     --bg-card: #1e293b;
     --text-color: #ffffff;
     --input-bg: #1e293b;
     --input-border: #475569;
-    --accent: #bef264; /* Verde lima */
+    --accent: #bef264; 
     --label-color: #ffffff;
 }
 
 body { background-color: var(--bg-app); color: var(--text-color); font-size: 13px; font-family: sans-serif; transition: 0.3s; }
 .app-container { max-width: 450px; margin: 0 auto; background: var(--bg-app); min-height: 100vh; } 
 
-.logo-header { height: 120px; width: auto; margin: 10px auto; object-fit: contain; } 
+.logo-header { height: 110px; width: auto; margin: 10px auto; object-fit: contain; } 
 
-#map-container { width: 100%; height: 300px; border-radius: 20px; margin-top: 15px; overflow: hidden; border: 1px solid var(--input-border); }
+#map-container { width: 100%; height: 280px; border-radius: 20px; margin-top: 15px; overflow: hidden; border: 1px solid var(--input-border); }
 #map { height: 100%; width: 100%; }
 
 .input-mini { 
@@ -51,18 +49,16 @@ body { background-color: var(--bg-app); color: var(--text-color); font-size: 13p
     background: var(--accent); color: #000; padding: 18px; border-radius: 16px; 
     font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; margin-bottom: 40px;
 }
-/* Si el azul es el activo, el texto del botón debe ser blanco */
 .light-mode-btn { color: white !important; }
 
 .section-card { background: var(--bg-card); padding: 16px; border-radius: 20px; border: 1px solid var(--input-border); margin-top: 15px; }
 
 .label-strong { font-size: 11px; font-weight: 900; color: var(--label-color); text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 3px solid var(--accent); padding-left: 8px; }
 
-.tab-btn { flex: 1; padding: 12px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
-.tab-active { background: #2563eb; color: white; }
+.tab-btn { flex: 1; padding: 12px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; transition: 0.2s; }
+.tab-active { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
 .tab-inactive { background: var(--bg-card); color: #94a3b8; border: 1px solid var(--input-border); }
 
-/* Botón flotante para cambiar modo */
 .toggle-theme {
     position: fixed; top: 20px; right: 20px; z-index: 100;
     background: var(--bg-card); border: 1px solid var(--input-border);
@@ -73,7 +69,7 @@ body { background-color: var(--bg-app); color: var(--text-color); font-size: 13p
 .hidden { display: none !important; }
 </style>
 </head>
-<body class="dark-mode" onload="initMap()"> <!-- Por defecto inicia en dark como la imagen -->
+<body class="dark-mode" onload="initMap()"> 
 
 <div class="toggle-theme" onclick="toggleTheme()" id="themeBtn">☀️</div>
 
@@ -83,40 +79,51 @@ body { background-color: var(--bg-app); color: var(--text-color); font-size: 13p
         <p id="subtitulo" class="text-blue-400 font-bold text-[10px] uppercase tracking-[3px]">Tu moto de confianza 🏍️</p>
     </div> 
 
+    <!-- PESTAÑAS DE SERVICIO -->
     <div class="flex gap-2 mb-4 p-1 rounded-xl">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Envío</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Compra</button>
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámite</button>
     </div> 
 
+    <!-- DIRECCIONES -->
     <div class="space-y-3">
-        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini">
-        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini">
+        <input id="inputO" type="text" placeholder="📍 Punto de retiro (Dirección)" class="input-mini">
+        <input id="inputD" type="text" placeholder="🏁 Punto de entrega (Dirección)" class="input-mini">
     </div> 
 
     <div id="map-container">
         <div id="map"></div>
     </div> 
 
-    <div id="seccionDatosEnvio" class="section-card">
-        <span class="label-strong">👤 Contactos</span>
-        <div class="grid grid-cols-2 gap-2">
-            <input id="fNombreO" type="text" placeholder="Nombre Envía" class="input-mini">
-            <input id="fNombreD" type="text" placeholder="Nombre Recibe" class="input-mini">
+    <!-- DATOS DE CLIENTES CORREGIDOS -->
+    <div id="seccionContactos" class="section-card">
+        <span class="label-strong">👤 Información de contacto</span>
+        <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+                <input id="fNombreO" type="text" placeholder="Nombre de quien envía" class="input-mini">
+                <input id="fTelO" type="tel" placeholder="WhatsApp (Número)" class="input-mini">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="fNombreD" type="text" placeholder="Nombre de quien recibe" class="input-mini">
+                <input id="fTelD" type="tel" placeholder="WhatsApp (Número)" class="input-mini">
+            </div>
         </div>
     </div>
 
+    <!-- DETALLES CON EJEMPLOS DINÁMICOS -->
     <div class="section-card">
-        <span id="labelDetalle" class="label-strong">¿Qué llevamos?</span>
-        <textarea id="obs" placeholder="Ej: Llaves, sobre..." class="input-mini h-20"></textarea>
+        <span id="labelDetalle" class="label-strong">¿Qué enviamos?</span>
+        <textarea id="obs" placeholder="Ejemplo: Llaves, sobre con documentos, cargador, ropa..." class="input-mini h-24"></textarea>
     </div> 
 
+    <!-- PRECIO Y BOTÓN FINAL -->
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="bg-black text-white p-4 rounded-2xl text-center mb-2 border border-slate-700">
-            <p class="text-[10px] uppercase text-slate-400">Total del servicio</p>
+            <p class="text-[10px] uppercase text-slate-400">Costo del envío</p>
             <p class="text-4xl font-black italic">$<span id="precioTotal">0</span></p>
         </div>
-        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
+        <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
     </div>
 </div> 
 
@@ -128,21 +135,10 @@ let tipoServicio = 'envio';
 let costoEnvio = 0;
 
 function toggleTheme() {
-    const body = document.body;
-    const btn = document.getElementById('themeBtn');
-    const finalBtn = document.getElementById('btnFinal');
-    
     isDarkMode = !isDarkMode;
-    
-    if(isDarkMode) {
-        body.classList.add('dark-mode');
-        btn.innerText = "☀️";
-        finalBtn.classList.remove('light-mode-btn');
-    } else {
-        body.classList.remove('dark-mode');
-        btn.innerText = "🌙";
-        finalBtn.classList.add('light-mode-btn');
-    }
+    document.body.classList.toggle('dark-mode', isDarkMode);
+    document.getElementById('themeBtn').innerText = isDarkMode ? "☀️" : "🌙";
+    document.getElementById('btnFinal').classList.toggle('light-mode-btn', !isDarkMode);
 }
 
 function setServicio(tipo) {
@@ -152,9 +148,19 @@ function setServicio(tipo) {
     });
     
     const label = document.getElementById('labelDetalle');
-    if(tipo === 'compra') label.innerText = "¿QUÉ COMPRAMOS?";
-    else if (tipo === 'tramite') label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
-    else label.innerText = "¿QUÉ LLEVAMOS?";
+    const obs = document.getElementById('obs');
+
+    // Cambiar ejemplos según el servicio
+    if(tipo === 'compra') {
+        label.innerText = "¿Qué compramos?";
+        obs.placeholder = "Ejemplo: 1kg de pan, leche, gaseosa, remedios de farmacia...";
+    } else if (tipo === 'tramite') {
+        label.innerText = "¿Qué trámite hacemos?";
+        obs.placeholder = "Ejemplo: Retiro de DNI, estudios médicos, pago de boletas, carpetas...";
+    } else {
+        label.innerText = "¿Qué enviamos?";
+        obs.placeholder = "Ejemplo: Llaves, sobre con documentos, cargador, ropa...";
+    }
     
     if(costoEnvio > 0) trazar();
 }
@@ -164,7 +170,7 @@ let map, directionsService, directionsRenderer, markerO, markerD;
 function initMap() {
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
-    map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 15, disableDefaultUI: true });
+    map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true });
     directionsRenderer.setMap(map);
 
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
@@ -185,8 +191,8 @@ function trazar() {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
-            costoEnvio = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            if(tipoServicio !== 'envio') costoEnvio += 5000;
+            costoEnvio = Math.ceil((3000 + (kms * 400)) / 100) * 100;
+            if(tipoServicio !== 'envio') costoEnvio += 3000;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
@@ -194,9 +200,19 @@ function trazar() {
 }
 
 function enviarWhatsApp() {
-    let msg = `COMANDA MANDADITOS%0A🛠️ SERVICIO: ${tipoServicio.toUpperCase()}%0A%0A`;
-    msg += `📍 RETIRO: ${document.getElementById('inputO').value}%0A🏁 ENTREGA: ${document.getElementById('inputD').value}%0A%0A`;
-    msg += `📝 DETALLE: ${document.getElementById('obs').value}%0A%0A⭐ TOTAL: $${costoEnvio}`;
+    let nO = document.getElementById('fNombreO').value;
+    let tO = document.getElementById('fTelO').value;
+    let nD = document.getElementById('fNombreD').value;
+    let tD = document.getElementById('fTelD').value;
+
+    let msg = `*NUEVO PEDIDO: ${tipoServicio.toUpperCase()}*%0A%0A`;
+    msg += `📍 *Retiro:* ${document.getElementById('inputO').value}%0A`;
+    msg += `🏁 *Entrega:* ${document.getElementById('inputD').value}%0A%0A`;
+    msg += `👤 *De:* ${nO} (${tO})%0A`;
+    msg += `👤 *Para:* ${nD} (${tD})%0A%0A`;
+    msg += `📝 *Detalle:* ${document.getElementById('obs').value}%0A%0A`;
+    msg += `⭐ *Costo:* $${costoEnvio}`;
+    
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
 </script>
