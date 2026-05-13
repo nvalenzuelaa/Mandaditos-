@@ -18,9 +18,10 @@
         .hidden { display: none !important; }
         .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .label-strong { font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
-        .tab-btn { flex: 1; padding: 8px 4px; font-weight: bold; border-radius: 10px; transition: 0.3s; font-size: 11px; }
+        .tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; transition: 0.3s; font-size: 12px; }
         .tab-active { background: #1e40af; color: white; }
         .tab-inactive { background: #e2e8f0; color: #64748b; }
+        .nota-informativa { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; line-height: 1.4; }
         .nota-seguridad { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
@@ -37,11 +38,16 @@
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div>
 
-    <!-- SELECTOR DE TRES OPCIONES -->
-    <div class="flex gap-1 mb-4 bg-slate-100 p-1 rounded-xl">
+    <div class="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Envío</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Compra</button>
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive">📑 Trámite</button>
+    </div>
+
+    <!-- AVISO ESPECÍFICO PARA TRÁMITES -->
+    <div id="avisoTramiteInfo" class="nota-informativa hidden">
+        <strong>💡 ¿Qué puedes pedir aquí?</strong><br>
+        Usa esta sección para retirar compras ya pagadas, estudios médicos, documentos o retirar llaves.
     </div>
 
     <div class="space-y-2">
@@ -53,7 +59,7 @@
         <div id="map"></div>
     </div>
 
-    <!-- DATOS DE CONTACTO (DINÁMICOS) -->
+    <!-- SECCIÓN DATOS DINÁMICA -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
             <span class="label-strong">👤 Datos del que envía</span>
@@ -72,8 +78,8 @@
     </div>
 
     <div id="seccionDatosSimples" class="hidden">
-        <div class="section-card border-blue-100">
-            <span class="label-strong border-blue-700">👤 Tus Datos</span>
+        <div class="section-card border-blue-100 shadow-sm">
+            <span class="label-strong border-blue-700">👤 Tus Datos de Contacto</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreS" type="text" placeholder="Tu Nombre" class="input-mini">
                 <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-mini">
@@ -81,7 +87,6 @@
         </div>
     </div>
 
-    <!-- DETALLES DEL PEDIDO -->
     <div class="section-card bg-blue-50 border-blue-200">
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
         <textarea id="obs" placeholder="Ej: Llaves, sobre, comida..." class="input-mini h-24"></textarea>
@@ -100,7 +105,7 @@
     </div>
 
     <div id="boxPrecio" class="mt-6 hidden">
-        <div id="avisoTransferencia" class="nota-seguridad hidden"></div>
+        <div id="avisoSeguridad" class="nota-seguridad hidden"></div>
         
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
@@ -127,27 +132,28 @@ function setServicio(tipo) {
     const sSimples = document.getElementById('seccionDatosSimples');
     const label = document.getElementById('labelDetalle');
     const bPago = document.getElementById('boxPagoMercaderia');
-    const aviso = document.getElementById('avisoTransferencia');
+    const avisoSeg = document.getElementById('avisoSeguridad');
+    const avisoTra = document.getElementById('avisoTramiteInfo');
     const nota = document.getElementById('notaCarga');
 
     if(tipo === 'compra') {
         sEnvio.classList.add('hidden'); sSimples.classList.remove('hidden');
-        bPago.classList.add('hidden'); aviso.classList.remove('hidden');
-        nota.classList.remove('hidden');
-        aviso.innerHTML = "🔒 CONFIRMACIÓN:<br>Para comprar, transferí el costo del servicio por adelantado.";
+        bPago.classList.add('hidden'); avisoSeg.classList.remove('hidden');
+        avisoTra.classList.add('hidden'); nota.classList.remove('hidden');
+        avisoSeg.innerHTML = "🔒 CONFIRMACIÓN:<br>Para comprar, transferí el costo del servicio por adelantado.";
         label.innerText = "🛒 LISTA DE COMPRAS";
         document.getElementById('obs').placeholder = "Ej: 1 Leche, pan, remedio de farmacia...";
     } else if (tipo === 'tramite') {
         sEnvio.classList.add('hidden'); sSimples.classList.remove('hidden');
-        bPago.classList.add('hidden'); aviso.classList.remove('hidden');
-        nota.classList.add('hidden');
-        aviso.innerHTML = "📝 NOTA:<br>Asegurate que el pedido ya esté pago o que me autoricen a retirar.";
+        bPago.classList.add('hidden'); avisoSeg.classList.remove('hidden');
+        avisoTra.classList.remove('hidden'); nota.classList.add('hidden');
+        avisoSeg.innerHTML = "📝 NOTA:<br>Asegurate que el retiro esté autorizado o pagado.";
         label.innerText = "📑 DETALLES DEL TRÁMITE / RETIRO";
-        document.getElementById('obs').placeholder = "Ej: Retirar estudio médico de Juan Perez o pedido pago en Local X...";
+        document.getElementById('obs').placeholder = "Ej: Retirar estudio médico o pedido en Local X...";
     } else {
         sEnvio.classList.remove('hidden'); sSimples.classList.add('hidden');
-        bPago.classList.remove('hidden'); aviso.classList.add('hidden');
-        nota.classList.add('hidden');
+        bPago.classList.remove('hidden'); avisoSeg.classList.add('hidden');
+        avisoTra.classList.add('hidden'); nota.classList.add('hidden');
         label.innerText = "¿Qué llevamos?";
         document.getElementById('obs').placeholder = "Ej: Llaves, un sobre, comida...";
     }
@@ -193,11 +199,9 @@ function trazar() {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
             let base = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            
             if(tipoServicio === 'compra') costoEnvio = base + RECARGO_COMPRA;
             else if(tipoServicio === 'tramite') costoEnvio = base + RECARGO_TRAMITE;
             else costoEnvio = base;
-
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
@@ -205,15 +209,17 @@ function trazar() {
 }
 
 function enviarWhatsApp() {
-    let nO, tO, nD, tD;
+    let datosCliente = "";
     if(tipoServicio === 'envio') {
-        nO = document.getElementById('fNombreO').value || "-";
-        tO = document.getElementById('fTelO').value || "-";
-        nD = document.getElementById('fNombreD').value || "-";
-        tD = document.getElementById('fTelD').value || "-";
+        const nO = document.getElementById('fNombreO').value || "-";
+        const tO = document.getElementById('fTelO').value || "-";
+        const nD = document.getElementById('fNombreD').value || "-";
+        const tD = document.getElementById('fTelD').value || "-";
+        datosCliente = `*CONTACTO:*%0AEnvía: ${nO} (${tO})%0ARecibe: ${nD} (${tD})`;
     } else {
-        nO = document.getElementById('fNombreS').value || "-";
-        tO = document.getElementById('fTelS').value || "-";
+        const nS = document.getElementById('fNombreS').value || "-";
+        const tS = document.getElementById('fTelS').value || "-";
+        datosCliente = `*CLIENTE:* ${nS} (${tS})`;
     }
 
     const dO = document.getElementById('inputO').value || "-";
@@ -224,18 +230,19 @@ function enviarWhatsApp() {
 
     let msg = "*COMANDA MANDADITOS*%0A";
     msg += "🛠️ SERVICIO: " + tipoServicio.toUpperCase() + "%0A%0A";
-    msg += "*ORIGEN:* " + dO + "%0A";
-    msg += "*DESTINO:* " + dD + "%0A%0A";
-    
-    msg += "*CONTACTO:* " + nO + " (" + tO + ")%0A%0A";
+    msg += "*PUNTO A (Retiro):*%0A" + dO + "%0A%0A";
+    msg += "*PUNTO B (Entrega):*%0A" + dD + "%0A%0A";
+    msg += datosCliente + "%0A%0A";
     msg += "*DETALLES:* " + obs + "%0A%0A";
     
-    if(hayQuePagar) msg += "💵 *PAGAR AL RETIRAR:* $" + montoEfectivo + "%0A";
+    if(hayQuePagar) msg += "💵 *PAGAR EN ORIGEN:* $" + montoEfectivo + "%0A";
     msg += "💰 *COSTO SERVICIO:* $" + costoEnvio + "%0A";
     msg += "⭐ *TOTAL:* $" + (parseInt(costoEnvio) + parseInt(montoEfectivo)) + "%0A%0A";
     
-    if(tipoServicio === 'compra') msg += "⚠️ _Requiere transferencia para confirmar._";
+    if(tipoServicio === 'compra') msg += "⚠️ _Requiere transferencia para confirmar servicio._";
     if(tipoServicio === 'tramite') msg += "📑 _Confirmar que el retiro esté autorizado._";
+    
+    msg += "%0A📍 GPS: https://www.google.com/maps?q=" + markerO.getPosition().lat() + "," + markerO.getPosition().lng();
 
     window.location.href = "https://api.whatsapp.com/send?phone=543764904731&text=" + msg;
 }
