@@ -18,8 +18,6 @@
         .hidden { display: none !important; }
         .section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .label-strong { font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
-        
-        #pantalla-cerrado { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
         .tab-btn { flex: 1; padding: 10px; font-weight: bold; border-radius: 10px; transition: 0.3s; }
         .tab-active { background: #1e40af; color: white; }
         .tab-inactive { background: #e2e8f0; color: #64748b; }
@@ -27,7 +25,7 @@
 </head>
 <body onload="initMap()">
 
-<div id="pantalla-cerrado" class="hidden">
+<div id="pantalla-cerrado" class="hidden fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center text-center p-8">
     <img src="png.png" alt="Logo" class="h-32 mb-6 object-contain">
     <h2 class="text-xl font-bold text-slate-700">En este momento no estoy trabajando 😴</h2>
 </div>
@@ -38,34 +36,47 @@
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div>
 
-    <!-- SELECCIÓN DE SERVICIO -->
     <div class="flex gap-2 mb-4">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active">📦 Solo Envío</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive">🛒 Hacer Compra</button>
     </div>
 
     <div class="space-y-2">
-        <input id="inputO" type="text" placeholder="📍 Punto de Retiro / Comercio" class="input-mini border-blue-200">
-        <input id="inputD" type="text" placeholder="🏁 Punto de Entrega (Tu casa)" class="input-mini border-blue-200">
+        <input id="inputO" type="text" placeholder="📍 Punto de retiro" class="input-mini border-blue-200">
+        <input id="inputD" type="text" placeholder="🏁 Punto de entrega" class="input-mini border-blue-200">
     </div>
 
     <div id="map-container" class="rounded-2xl overflow-hidden shadow-inner">
         <div id="map"></div>
     </div>
 
-    <div class="section-card border-blue-100">
-        <span class="label-strong">👤 Datos de Retiro / Compra</span>
-        <div class="grid grid-cols-2 gap-2">
-            <input id="fNombreO" type="text" placeholder="Nombre/Local" class="input-mini">
-            <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
+    <!-- SECCIÓN DATOS ENVÍO (Se oculta en compras) -->
+    <div id="seccionDatosEnvio">
+        <div class="section-card border-blue-100">
+            <span class="label-strong">👤 Datos del que envía</span>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
+                <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
+            </div>
+        </div>
+        <div class="section-card border-blue-100">
+            <span class="label-strong">📦 Datos de quien recibe</span>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
+                <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
+            </div>
         </div>
     </div>
 
-    <div class="section-card border-blue-100">
-        <span class="label-strong">📦 Datos de quien Recibe</span>
-        <div class="grid grid-cols-2 gap-2">
-            <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
-            <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
+    <!-- SECCIÓN DATOS COMPRA (Solo se ve en compras) -->
+    <div id="seccionDatosCompra" class="hidden">
+        <div class="section-card border-orange-100 bg-orange-50">
+            <span class="label-strong text-orange-700 border-orange-700">👤 Tus Datos</span>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="fNombreC" type="text" placeholder="Nombre" class="input-mini">
+                <input id="fTelC" type="tel" placeholder="WhatsApp" class="input-mini">
+            </div>
+            <p class="text-[11px] text-orange-800 mt-3 font-bold">⚠️ Para confirmar la compra necesito una transferencia previa.</p>
         </div>
     </div>
 
@@ -80,16 +91,15 @@
                 <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked class="w-5 h-5" onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
             </div>
             <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="Monto estimado mercadería $" class="input-mini text-center border-blue-400 font-bold">
+                <input id="fMonto" type="number" placeholder="Monto estimado $" class="input-mini text-center border-blue-400 font-bold">
             </div>
         </div>
     </div>
 
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Costo del servicio</p>
+            <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
             <p class="text-4xl font-black italic text-green-400">$<span id="precioTotal">0</span></p>
-            <p id="txtRecargo" class="text-[9px] text-blue-300 hidden">+ Recargo por servicio de compra incluido</p>
         </div>
         <button onclick="enviarWhatsApp()" class="btn-main">Pedir Mandadito 🚀</button>
     </div>
@@ -99,30 +109,33 @@
 
 <script>
 const ESTADO_APP = "ON"; 
-let tipoServicio = 'envio'; // 'envio' o 'compra'
-const RECARGO_COMPRA = 1000; // Cuánto más cobrás por ir a comprar vos
+let tipoServicio = 'envio';
+const RECARGO_COMPRA = 5000; 
 
 function setServicio(tipo) {
     tipoServicio = tipo;
     const btnE = document.getElementById('btnEnvio');
     const btnC = document.getElementById('btnCompra');
+    const sEnvio = document.getElementById('seccionDatosEnvio');
+    const sCompra = document.getElementById('seccionDatosCompra');
     const label = document.getElementById('labelDetalle');
-    const txtRecargo = document.getElementById('txtRecargo');
 
     if(tipo === 'compra') {
         btnC.className = "tab-btn tab-active";
         btnE.className = "tab-btn tab-inactive";
-        label.innerText = "🛒 LISTA DE COMPRAS (Sé específico)";
-        document.getElementById('obs').placeholder = "Ej: 1 Leche entera, 2 packs de galletitas...";
-        txtRecargo.classList.remove('hidden');
+        sEnvio.classList.add('hidden');
+        sCompra.classList.remove('hidden');
+        label.innerText = "🛒 LISTA DE COMPRAS";
+        document.getElementById('obs').placeholder = "Especifica marcas y cantidades...";
     } else {
         btnE.className = "tab-btn tab-active";
         btnC.className = "tab-btn tab-inactive";
+        sEnvio.classList.remove('hidden');
+        sCompra.classList.add('hidden');
         label.innerText = "¿Qué llevamos?";
         document.getElementById('obs').placeholder = "Ej: Llaves, un sobre, comida...";
-        txtRecargo.classList.add('hidden');
     }
-    if(costoEnvio > 0) trazar(); // Recalcular precio
+    if(costoEnvio > 0) trazar();
 }
 
 let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
@@ -173,8 +186,19 @@ function trazar() {
 }
 
 function enviarWhatsApp() {
-    const nO = document.getElementById('fNombreO').value || "-";
-    const nD = document.getElementById('fNombreD').value || "-";
+    let nO, tO, nD, tD;
+    
+    if(tipoServicio === 'compra') {
+        nO = document.getElementById('fNombreC').value || "-";
+        tO = document.getElementById('fTelC').value || "-";
+        nD = "CLIENTE"; tD = "-";
+    } else {
+        nO = document.getElementById('fNombreO').value || "-";
+        tO = document.getElementById('fTelO').value || "-";
+        nD = document.getElementById('fNombreD').value || "-";
+        tD = document.getElementById('fTelD').value || "-";
+    }
+
     const dO = document.getElementById('inputO').value || "-";
     const dD = document.getElementById('inputD').value || "-";
     const obs = document.getElementById('obs').value || "-";
@@ -183,14 +207,25 @@ function enviarWhatsApp() {
 
     let msg = "*COMANDA MANDADITOS*%0A";
     msg += "🛠️ SERVICIO: " + (tipoServicio === 'compra' ? "🛒 COMPRA" : "📦 ENVÍO") + "%0A%0A";
-    msg += "*PUNTO A (Origen/Local):*%0A" + dO + "%0A";
-    msg += "*PUNTO B (Entrega):*%0A" + dD + "%0A%0A";
-    msg += "*DETALLES / LISTA:*%0A" + obs + "%0A%0A";
+    msg += "*ORIGEN (Retiro/Local):*%0A" + dO + "%0A%0A";
+    msg += "*DESTINO (Entrega):*%0A" + dD + "%0A%0A";
     
+    if(tipoServicio === 'compra') {
+        msg += "*DATOS SOLICITANTE:*%0A";
+        msg += "Nombre: " + nO + "%0A";
+        msg += "WhatsApp: " + tO + "%0A%0A";
+    } else {
+        msg += "*DATOS ENVÍO:*%0A";
+        msg += "De: " + nO + " (" + tO + ")%0A";
+        msg += "Para: " + nD + " (" + tD + ")%0A%0A";
+    }
+
+    msg += "*DETALLES / LISTA:*%0A" + obs + "%0A%0A";
     if(hayQuePagar) msg += "⚠️ *PAGAR EN LOCAL:* $" + montoEfectivo + "%0A";
-    msg += "💰 *COSTO MANDADO:* $" + costoEnvio + "%0A";
-    msg += "⭐ *TOTAL A COBRAR CLIENTE:* $" + (parseInt(costoEnvio) + parseInt(montoEfectivo)) + "%0A%0A";
-    msg += "📍 GPS Origen: https://www.google.com/maps?q=" + markerO.getPosition().lat() + "," + markerO.getPosition().lng();
+    msg += "💰 *COSTO SERVICIO:* $" + costoEnvio + "%0A";
+    msg += "⭐ *TOTAL:* $" + (parseInt(costoEnvio) + parseInt(montoEfectivo)) + "%0A%0A";
+    if(tipoServicio === 'compra') msg += "❗ _Recuerda realizar la transferencia para confirmar la compra._%0A%0A";
+    msg += "📍 GPS: https://www.google.com/maps?q=" + markerO.getPosition().lat() + "," + markerO.getPosition().lng();
 
     window.location.href = "https://api.whatsapp.com/send?phone=543764904731&text=" + msg;
 }
