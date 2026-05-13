@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mandaditos App</title> 
 
-<!-- Configuración para App (PWA) -->
 <link rel="apple-touch-icon" href="png.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -17,21 +16,20 @@
 body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; overflow-x: hidden; }
 .app-container { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 40px; } 
 .logo-header { height: 120px; width: auto; margin: 10px auto; object-fit: contain; } 
-#map-container { width: 100%; height: 300px; position: relative; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
+#map-container { width: 100%; height: 280px; position: relative; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background: #f1f5f9; margin-top: 10px; }
 #map { height: 100%; width: 100%; }
 .input-mini { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 13px; outline: none; background: #f8fafc; }
-.input-mini:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1); }
-.btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4); }
+.btn-main { background: #16a34a; color: white; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 16px; margin-bottom: 20px; }
 .precio-box { background: #0f172a; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; border: 2px solid #334155; }
 .hidden { display: none !important; }
-.section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.label-strong { font-size: 13px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
-.tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; transition: 0.3s; font-size: 12px; }
+.section-card { background: #ffffff; padding: 16px; border-radius: 20px; border: 2px solid #f1f5f9; margin-top: 15px; }
+.label-strong { font-size: 12px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 10px; display: block; border-left: 4px solid #1e40af; padding-left: 8px; }
+.tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
 .tab-active { background: #1e40af; color: white; }
 .tab-inactive { background: #e2e8f0; color: #64748b; }
-/* Banner Instalación */
-#installBanner { background: #1e40af; color: white; padding: 12px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; }
-/* Redes Sociales */
+.instrucciones { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 12px; border-radius: 12px; margin: 10px 0; font-size: 11px; color: #475569; line-height: 1.4; }
+.aviso-moto { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+.aviso-pago { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 .social-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 12px; background: #f8fafc; border: 1px solid #cbd5e1; font-weight: bold; font-size: 12px; flex: 1; text-decoration: none; color: #1e293b; }
 </style>
 </head>
@@ -43,13 +41,12 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div> 
 
-    <!-- BANNER INSTALACIÓN -->
-    <div id="installBanner">
-        <div class="flex items-center gap-2">
-            <img src="png.png" style="width: 30px; border-radius: 5px;">
-            <span class="text-[11px]">Guardar como Aplicación</span>
-        </div>
-        <button onclick="ayudaInstalar()" class="bg-white text-blue-800 px-3 py-1 rounded-lg text-[10px]">VER CÓMO</button>
+    <!-- PASOS PARA PEDIR -->
+    <div class="instrucciones">
+        <p><strong>¿Cómo pedir?</strong><br>
+        1️⃣ Elegí el tipo de servicio.<br>
+        2️⃣ Marcá los puntos A y B en el mapa.<br>
+        3️⃣ Completá los datos y confirmá por WhatsApp.</p>
     </div>
 
     <!-- PESTAÑAS -->
@@ -69,36 +66,44 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <div id="map"></div>
     </div> 
 
-    <!-- DATOS DE CONTACTO (CORREGIDOS) -->
+    <!-- DATOS DE CONTACTO -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
             <span class="label-strong">👤 Quien envía</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreO" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelO" type="tel" placeholder="N° WhatsApp" class="input-mini">
+                <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-mini">
             </div>
         </div>
         <div class="section-card border-blue-100">
             <span class="label-strong">📦 Quien recibe</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreD" type="text" placeholder="Nombre" class="input-mini">
-                <input id="fTelD" type="tel" placeholder="N° WhatsApp" class="input-mini">
+                <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-mini">
             </div>
         </div>
     </div>
 
     <div id="seccionDatosSimples" class="hidden">
         <div class="section-card border-blue-100">
-            <span class="label-strong">👤 Tus Datos</span>
+            <span class="label-strong">👤 Tus Datos de contacto</span>
             <div class="grid grid-cols-2 gap-2">
                 <input id="fNombreS" type="text" placeholder="Tu Nombre" class="input-mini">
-                <input id="fTelS" type="tel" placeholder="N° WhatsApp" class="input-mini">
+                <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-mini">
             </div>
         </div>
     </div> 
 
-    <!-- DETALLES (EJEMPLOS DINÁMICOS CORREGIDOS) -->
+    <!-- DETALLES Y AVISOS -->
     <div class="section-card bg-blue-50 border-blue-200">
+        <div id="avisoMoto" class="aviso-moto">
+            ⚠️ AVISO: Solo productos livianos que entren en mochila. No llevamos bultos grandes.
+        </div>
+
+        <div id="avisoPagoCompra" class="aviso-pago hidden">
+            💳 IMPORTANTE: Para compras, se abona el servicio por transferencia antes de salir.
+        </div>
+
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
         <textarea id="obs" placeholder="Ej: Llaves, un sobre, comida, ropa..." class="input-mini h-24"></textarea>
         
@@ -109,7 +114,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
                 <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('boxMonto').classList.add('hidden')"> NO</label>
             </div>
             <div id="boxMonto" class="hidden mt-3">
-                <input id="fMonto" type="number" placeholder="¿Cuánto hay que pagar? $" class="input-mini text-center border-blue-400 font-bold">
+                <input id="fMonto" type="number" placeholder="Monto a pagar $" class="input-mini text-center border-blue-400 font-bold">
             </div>
         </div>
     </div> 
@@ -143,12 +148,6 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 let tipoServicio = 'envio';
 let costoEnvio = 0;
 
-function ayudaInstalar() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if(isIOS) alert("En iPhone:\n1. Toca el botón 'Compartir' (el cuadrado con flechita).\n2. Dale a 'Añadir a pantalla de inicio'.");
-    else alert("En Android:\n1. Toca los 3 puntos arriba a la derecha.\n2. Toca en 'Instalar aplicación' o 'Añadir a pantalla de inicio'.");
-}
-
 function setServicio(tipo) {
     tipoServicio = tipo;
     ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(t => {
@@ -159,15 +158,18 @@ function setServicio(tipo) {
     document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
     document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
     
+    document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
+    document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
+
     const label = document.getElementById('labelDetalle');
     const textArea = document.getElementById('obs');
 
     if(tipo === 'compra') {
         label.innerText = "¿QUÉ COMPRAMOS?";
-        textArea.placeholder = "Ej: 1kg de pan, leche, Coca Cola, remedios...";
+        textArea.placeholder = "Ej: 1kg pan, leche, gaseosa, remedios...";
     } else if (tipo === 'tramite') {
         label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
-        textArea.placeholder = "Ej: Documento, estudios médicos, pagar boleta...";
+        textArea.placeholder = "Ej: Retirar documentos, estudios médicos, pagar boleta...";
     } else {
         label.innerText = "¿QUÉ LLEVAMOS?";
         textArea.placeholder = "Ej: Llaves, un sobre, comida, ropa...";
@@ -225,6 +227,8 @@ function enviarWhatsApp() {
         msg += `💵 *PAGAR ALLÍ:* $${document.getElementById('fMonto').value}%0A`;
     }
     
+    if(tipoServicio === 'compra') msg += `%0A⚠️ *NOTA:* Requiere transferencia previa del servicio.%0A`;
+
     msg += `%0A⭐ *COSTO ENVÍO:* $${costoEnvio}`;
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
