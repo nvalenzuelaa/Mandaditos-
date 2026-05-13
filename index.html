@@ -28,8 +28,13 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 .tab-active { background: #1e40af; color: white; }
 .tab-inactive { background: #e2e8f0; color: #64748b; }
 
+/* Estilos de Avisos y Pasos */
+.instrucciones { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+.step-item { display: flex; align-items: start; gap: 10px; margin-bottom: 5px; font-size: 12px; color: #1e3a8a; }
+.step-num { background: #1e40af; color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0; margin-top: 2px; }
+
 .aviso-moto { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
-.aviso-pago { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+.aviso-pago { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 
 .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
 .btn-fb { background: #1877F2; color: white; font-weight: bold; padding: 10px; border-radius: 12px; flex: 1; text-align: center; text-decoration: none; font-size: 12px; }
@@ -39,10 +44,19 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 <body onload="initMap()"> 
 
 <div id="contenido-app" class="app-container shadow-2xl p-4">
-    <div class="text-center mb-2">
+    <div class="text-center mb-4">
         <img src="png.png" alt="Logo" class="logo-header">
         <p class="text-blue-600 font-bold text-xs italic uppercase tracking-widest">Tu moto de confianza 🏍️</p>
     </div> 
+
+    <!-- PASOS DE USO -->
+    <div class="instrucciones shadow-sm">
+        <p class="font-black text-blue-900 mb-2 text-xs uppercase">🚀 ¿Cómo hacer un Mandadito?</p>
+        <div class="step-item"><div class="step-num">1</div> <p>Elegí el servicio (Envío, Compra o Trámite).</p></div>
+        <div class="step-item"><div class="step-num">2</div> <p>Marcá en el mapa los puntos <b>A</b> y <b>B</b>.</p></div>
+        <div class="step-item"><div class="step-num">3</div> <p>Completá los datos de contacto y detalles.</p></div>
+        <div class="step-item"><div class="step-num">4</div> <p><b>¡Confirmá y compartilo al WhatsApp de Mandaditos!</b></p></div>
+    </div>
 
     <!-- PESTAÑAS -->
     <div class="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
@@ -55,11 +69,11 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
     <div class="space-y-3 px-1">
         <div>
             <label class="label-strong">📍 PUNTO DE RETIRO (A)</label>
-            <input id="inputO" type="text" placeholder="Mueva el pin 'A' o escriba aquí..." class="input-mini border-blue-200">
+            <input id="inputO" type="text" placeholder="Mueva el pin 'A'..." class="input-mini border-blue-200">
         </div>
         <div>
             <label class="label-strong">🏁 PUNTO DE ENTREGA (B)</label>
-            <input id="inputD" type="text" placeholder="Mueva el pin 'B' o escriba aquí..." class="input-mini border-blue-200">
+            <input id="inputD" type="text" placeholder="Mueva el pin 'B'..." class="input-mini border-blue-200">
         </div>
     </div> 
 
@@ -97,11 +111,12 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 
     <!-- DETALLES -->
     <div class="section-card bg-blue-50 border-blue-200">
+        <!-- AVISO DE BULTOS PARA ENVÍOS Y COMPRAS -->
         <div id="avisoMoto" class="aviso-moto">
-            ⚠️ AVISO: Solo productos de tamaño chico o mediano.
+            ⚠️ AVISO: Solo productos chicos o medianos. NO LLEVAMOS BULTOS GRANDES.
         </div>
         <div id="avisoPagoCompra" class="aviso-pago hidden">
-            💳 IMPORTANTE: Compras se abonan por transferencia antes de salir.
+            💳 IMPORTANTE: El servicio se abona por transferencia antes de salir a comprar.
         </div>
 
         <span id="labelDetalle" class="label-strong border-none text-[11px]">¿Qué llevamos?</span>
@@ -125,7 +140,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
             <p class="text-4xl font-black italic text-green-400">$<span id="precioTotal">0</span></p>
         </div>
-        <button onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
+        <button onclick="enviarWhatsApp()" class="btn-main shadow-lg">Confirmar Pedido 🚀</button>
     </div>
 
     <!-- REDES -->
@@ -152,22 +167,18 @@ function initMap() {
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#1e40af", strokeWeight: 6 }, suppressMarkers: true });
     
-    // Centro inicial (Posadas) pero sin trazar nada aún
     map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true });
     directionsRenderer.setMap(map);
 
-    // Marcadores sin posición fija al inicio (para no gastar) o en puntos neutrales
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
     markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
 
-    // Autocompletado de texto
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
 
     autoO.addListener('place_changed', () => { markerO.setPosition(autoO.getPlace().geometry.location); map.setCenter(autoO.getPlace().geometry.location); trazar(); });
     autoD.addListener('place_changed', () => { markerD.setPosition(autoD.getPlace().geometry.location); trazar(); });
 
-    // Solo pedimos dirección y trazamos cuando el usuario mueve el pin
     markerO.addListener('dragend', () => { reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
     markerD.addListener('dragend', () => { reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
 }
@@ -181,7 +192,6 @@ function reverseGeocode(pos, inputId) {
 }
 
 function trazar() {
-    // Solo trazar si ambos inputs tienen algo escrito para evitar consumos accidentales
     if(document.getElementById('inputO').value === "" || document.getElementById('inputD').value === "") return;
 
     directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), travelMode: 'DRIVING' }, (res, stat) => {
@@ -207,6 +217,8 @@ function setServicio(tipo) {
     document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
     document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
     document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
+    
+    // El aviso de moto (bultos grandes) sale en Envíos y Compras
     document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
     document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
     
@@ -215,13 +227,13 @@ function setServicio(tipo) {
 
     if(tipo === 'compra') {
         label.innerText = "¿QUÉ COMPRAMOS?";
-        area.placeholder = "Ej: 1kg pan, coca de 2L, remedios...";
+        area.placeholder = "Ej: Pan, gaseosa, remedios...";
     } else if (tipo === 'tramite') {
         label.innerText = "¿QUÉ TRÁMITES HACEMOS?";
-        area.placeholder = "Ej: Retirar estudios, pagar boleta, dejar sobre...";
+        area.placeholder = "Ej: Pagar boletas, retirar estudios...";
     } else {
         label.innerText = "¿QUÉ LLEVAMOS?";
-        area.placeholder = "Ej: Llaves, una bolsa, ropa...";
+        area.placeholder = "Ej: Llaves, sobres, ropa...";
     }
     
     if(rutaTrazada) trazar();
@@ -233,7 +245,7 @@ function enviarWhatsApp() {
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${msg}`;
 }
 
-function ayudaInstalar() { alert("Para guardar en el celu:\nEn iPhone: Botón compartir y 'Añadir a pantalla de inicio'.\nEn Android: 3 puntos y 'Instalar'."); }
+function ayudaInstalar() { alert("Para instalar:\niPhone: Compartir -> Pantalla de inicio.\nAndroid: 3 puntos -> Instalar."); }
 </script>
 </body>
 </html>
