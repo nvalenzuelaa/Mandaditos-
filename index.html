@@ -150,14 +150,23 @@ function setServicio(tipo) {
     document.getElementById('avisoTramiteInfo').classList.toggle('hidden', tipo !== 'tramite');
     document.getElementById('notaCarga').classList.toggle('hidden', tipo !== 'compra');
     
+    const label = document.getElementById('labelDetalle');
+    const textArea = document.getElementById('obs');
     const avisoSeg = document.getElementById('avisoSeguridad');
+
     if(tipo === 'compra') {
+        label.innerText = "¿QUÉ COMPRAMOS?";
+        textArea.placeholder = "Ej: 1 Leche, pan, remedio de farmacia...";
         avisoSeg.classList.remove('hidden');
         avisoSeg.innerHTML = "🔒 CONFIRMACIÓN:<br>Para comprar, transferí el costo del servicio por adelantado.";
-        document.getElementById('labelDetalle').innerText = "🛒 LISTA DE COMPRAS";
-    } else {
+    } else if (tipo === 'tramite') {
+        label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
+        textArea.placeholder = "Ej: Retirar estudio médico, pagar boleta, retirar pedido en Local X...";
         avisoSeg.classList.add('hidden');
-        document.getElementById('labelDetalle').innerText = tipo === 'tramite' ? "📑 DETALLES DEL TRÁMITE" : "¿Qué llevamos?";
+    } else {
+        label.innerText = "¿QUÉ LLEVAMOS?";
+        textArea.placeholder = "Ej: Llaves, un sobre, comida...";
+        avisoSeg.classList.add('hidden');
     }
     
     if(costoEnvio > 0) trazar();
@@ -236,7 +245,13 @@ function enviarWhatsApp() {
     msg += "PUNTO A (Retiro):%0A" + dO + "%0A%0A";
     msg += "PUNTO B (Entrega):%0A" + dD + "%0A%0A";
     msg += datosCliente + "%0A%0A";
-    msg += "DETALLES: " + obs + "%0A%0A";
+    
+    // Título dinámico para el detalle en WhatsApp
+    let tituloDetalle = "DETALLES: ";
+    if(tipoServicio === 'compra') tituloDetalle = "LISTA DE COMPRAS: ";
+    if(tipoServicio === 'tramite') tituloDetalle = "TRÁMITE: ";
+    
+    msg += tituloDetalle + obs + "%0A%0A";
     if(hayQuePagar) msg += "💵 PAGAR PRODUCTO: $" + montoEfectivo + "%0A";
     msg += "⭐ COSTO ENVÍO: $" + costoEnvio + "%0A%0A";
     
