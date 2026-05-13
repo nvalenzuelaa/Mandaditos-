@@ -215,7 +215,7 @@ function trazar() {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
             let base = Math.ceil((3000 + (kms * 350)) / 100) * 100;
-            costoEnvio = (tipoServicio !== 'envio') ? (base + 3000) : base;
+            costoEnvio = (tipoServicio !== 'envio') ? (base + 4000) : base;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
         }
