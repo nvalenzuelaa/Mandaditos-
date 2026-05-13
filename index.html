@@ -27,10 +27,11 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 .tab-btn { flex: 1; padding: 10px 4px; font-weight: bold; border-radius: 10px; font-size: 12px; }
 .tab-active { background: #1e40af; color: white; }
 .tab-inactive { background: #e2e8f0; color: #64748b; }
-.instrucciones { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 12px; border-radius: 12px; margin: 10px 0; font-size: 11px; color: #475569; line-height: 1.4; }
+.instrucciones { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 12px; border-radius: 12px; margin: 10px 0; font-size: 11px; color: #475569; }
 .aviso-moto { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 .aviso-pago { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center; }
 .social-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 12px; background: #f8fafc; border: 1px solid #cbd5e1; font-weight: bold; font-size: 12px; flex: 1; text-decoration: none; color: #1e293b; }
+.btn-install { background: #1e40af; color: white; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; border: none; cursor: pointer; }
 </style>
 </head>
 <body onload="initMap()"> 
@@ -66,7 +67,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <div id="map"></div>
     </div> 
 
-    <!-- DATOS DE CONTACTO -->
+    <!-- SECCIÓN DATOS -->
     <div id="seccionDatosEnvio">
         <div class="section-card border-blue-100">
             <span class="label-strong">👤 Quien envía</span>
@@ -97,7 +98,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
     <!-- DETALLES Y AVISOS -->
     <div class="section-card bg-blue-50 border-blue-200">
         <div id="avisoMoto" class="aviso-moto">
-            ⚠️ AVISO: Solo productos livianos que entren en mochila. No llevamos bultos grandes.
+            ⚠️ AVISO: Solo productos de tamaño chico o mediano. No llevamos bultos grandes.
         </div>
 
         <div id="avisoPagoCompra" class="aviso-pago hidden">
@@ -119,7 +120,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         </div>
     </div> 
 
-    <!-- PRECIO Y BOTÓN -->
+    <!-- PRECIO Y BOTÓN FINAL -->
     <div id="boxPrecio" class="mt-6 hidden">
         <div class="precio-box">
             <p class="text-[10px] uppercase font-bold text-slate-400">Total del servicio</p>
@@ -128,11 +129,15 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <button id="btnFinal" onclick="enviarWhatsApp()" class="btn-main">Confirmar Pedido 🚀</button>
     </div>
 
-    <!-- REDES SOCIALES -->
-    <div class="mt-8">
+    <!-- SECCIÓN INSTALAR Y REDES -->
+    <div class="mt-10 p-2">
+        <button onclick="ayudaInstalar()" class="btn-install">
+            📲 GUARDAR COMO APLICACIÓN
+        </button>
+        
         <p class="text-center font-bold text-blue-800 mb-3 text-[11px] uppercase tracking-wider">Seguinos en nuestras redes</p>
         <div class="flex gap-3">
-            <a href="https://www.instagram.com/mandaditos_envios" target="_blank" class="social-link">
+            <a href="https://www.instagram.com/mandaditos_posadas" target="_blank" class="social-link">
                 <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="16"> Instagram
             </a>
             <a href="https://www.facebook.com/share/1Geoaa3Knd/" target="_blank" class="social-link">
@@ -148,6 +153,15 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 let tipoServicio = 'envio';
 let costoEnvio = 0;
 
+function ayudaInstalar() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if(isIOS) {
+        alert("Para instalar en iPhone:\n1. Toca el botón 'Compartir' (el cuadrado con flechita arriba).\n2. Selecciona 'Añadir a pantalla de inicio'.\n¡Y listo! Ya aparecerá el logo en tu menú.");
+    } else {
+        alert("Para instalar en Android:\n1. Toca los 3 puntos arriba a la derecha.\n2. Toca 'Instalar aplicación' o 'Añadir a pantalla de inicio'.\n¡Listo! Ya nos tendrás en tu menú.");
+    }
+}
+
 function setServicio(tipo) {
     tipoServicio = tipo;
     ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(t => {
@@ -157,7 +171,6 @@ function setServicio(tipo) {
     document.getElementById('seccionDatosEnvio').classList.toggle('hidden', tipo !== 'envio');
     document.getElementById('seccionDatosSimples').classList.toggle('hidden', tipo === 'envio');
     document.getElementById('boxPagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
-    
     document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
     document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
 
@@ -169,7 +182,7 @@ function setServicio(tipo) {
         textArea.placeholder = "Ej: 1kg pan, leche, gaseosa, remedios...";
     } else if (tipo === 'tramite') {
         label.innerText = "¿QUÉ TRÁMITE HACEMOS?";
-        textArea.placeholder = "Ej: Retirar documentos, estudios médicos, pagar boleta...";
+        textArea.placeholder = "Ej: Retirar documentos, estudios médicos...";
     } else {
         label.innerText = "¿QUÉ LLEVAMOS?";
         textArea.placeholder = "Ej: Llaves, un sobre, comida, ropa...";
@@ -212,7 +225,7 @@ function trazar() {
 function enviarWhatsApp() {
     let datos = "";
     if(tipoServicio === 'envio') {
-        datos = `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value} (${document.getElementById('fTelO').value})%0ARecibe: ${document.getElementById('fNombreD').value} (${document.getElementById('fTelD').value})`;
+        datos = `*CONTACTO:*%0AEnvía: ${document.getElementById('fNombreO').value}%0ARecibe: ${document.getElementById('fNombreD').value}`;
     } else {
         datos = `*CLIENTE:* ${document.getElementById('fNombreS').value} (${document.getElementById('fTelS').value})`;
     }
