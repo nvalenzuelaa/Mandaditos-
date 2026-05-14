@@ -154,18 +154,37 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 let tipoServicio = 'envio';
 let costoEnvio = 0;
 let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
-let rutaTrazada = false;
 
 function initMap() {
     geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#1e40af", strokeWeight: 6 }, suppressMarkers: true });
+    
     map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true });
     directionsRenderer.setMap(map);
+
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
     markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
+
+    // Autocompletado
+    const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
+    const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
+
+    autoO.addListener('place_changed', () => { 
+        let place = autoO.getPlace();
+        if(place.geometry) { markerO.setPosition(place.geometry.location); map.setCenter(place.geometry.location); trazar(); }
+    });
+    autoD.addListener('place_changed', () => { 
+        let place = autoD.getPlace();
+        if(place.geometry) { markerD.setPosition(place.geometry.location); trazar(); }
+    });
+
+    // Eventos de arrastre que disparan el trazo siempre
     markerO.addListener('dragend', () => { reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
     markerD.addListener('dragend', () => { reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
+
+    // Intento inicial por si ya hay valores
+    trazar();
 }
 
 function miUbicacion() {
@@ -175,20 +194,29 @@ function miUbicacion() {
             markerO.setPosition(pos);
             map.setCenter(pos);
             reverseGeocode(pos, 'inputO');
-            trazar();
+            setTimeout(trazar, 500); // Pequeño delay para asegurar que reverseGeocode trabaje
         });
     }
 }
 
 function reverseGeocode(pos, inputId) {
     geocoder.geocode({ location: pos }, (results, status) => {
-        if (status === "OK" && results[0]) document.getElementById(inputId).value = results[0].formatted_address;
+        if (status === "OK" && results[0]) {
+            document.getElementById(inputId).value = results[0].formatted_address;
+            trazar(); // Forzar el trazo después de obtener la dirección escrita
+        }
     });
 }
 
 function trazar() {
-    if(!document.getElementById('inputO').value || !document.getElementById('inputD').value) return;
-    directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), travelMode: 'DRIVING' }, (res, stat) => {
+    // Verificamos que ambos pines tengan posición válida
+    if(!markerO.getPosition() || !markerD.getPosition()) return;
+
+    directionsService.route({ 
+        origin: markerO.getPosition(), 
+        destination: markerD.getPosition(), 
+        travelMode: 'DRIVING' 
+    }, (res, stat) => {
         if (stat === 'OK') {
             directionsRenderer.setDirections(res);
             let kms = (res.routes[0].legs[0].distance.value / 1000);
@@ -196,7 +224,6 @@ function trazar() {
             costoEnvio = Math.ceil((basePrecio + (kms * 350)) / 100) * 100;
             document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             document.getElementById('boxPrecio').classList.remove('hidden');
-            rutaTrazada = true;
         }
     });
 }
@@ -212,7 +239,7 @@ function setServicio(tipo) {
     document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
     document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
     document.getElementById('labelDetalle').innerText = (tipo === 'compra') ? "¿QUÉ COMPRAMOS?" : (tipo === 'tramite') ? "¿QUÉ TRÁMITES HACEMOS?" : "¿QUÉ LLEVAMOS?";
-    if(rutaTrazada) trazar();
+    trazar();
 }
 
 function enviarWhatsApp() {
@@ -257,9 +284,7 @@ function enviarWhatsApp() {
     
     comanda += `*💰 TOTALES:*%0A`;
     comanda += `🛵 Envío: $${costoEnvio}%0A`;
-    if(hayPago) {
-        comanda += `🛒 Mercadería: $${montoAbonar}%0A`;
-    }
+    if(hayPago) comanda += `🛒 Mercadería: $${montoAbonar}%0A`;
     comanda += `*💵 TOTAL A COBRAR: $${totalFinal}*`;
 
     window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${comanda}`;
@@ -268,4 +293,5 @@ function enviarWhatsApp() {
 function ayudaInstalar() { alert("Para instalar:\niPhone: Compartir -> Pantalla de inicio.\nAndroid: 3 puntos -> Instalar."); }
 </script>
 </body>
-</html>
+    </html>
+    
