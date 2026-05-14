@@ -66,7 +66,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
         <div>
             <label class="label-strong">📍 PUNTO DE RETIRO (A)</label>
             <div class="flex gap-2">
-                <input id="inputO" type="text" placeholder="Mueva el pin 'A'..." class="input-mini border-blue-200">
+                <input id="inputO" type="text" placeholder="Mueva el pin 'A' o use GPS..." class="input-mini border-blue-200">
                 <button onclick="miUbicacion()" class="btn-gps"><i class="fas fa-crosshairs"></i></button>
             </div>
         </div>
@@ -154,6 +154,7 @@ body { background-color: #f1f5f9; font-size: 13px; font-family: sans-serif; over
 let tipoServicio = 'envio';
 let costoEnvio = 0;
 let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
+let interactuado = false; // Control de créditos
 
 function initMap() {
     geocoder = new google.maps.Geocoder();
@@ -166,25 +167,20 @@ function initMap() {
     markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true, label: "A" });
     markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true, label: "B" });
 
-    // Autocompletado
     const autoO = new google.maps.places.Autocomplete(document.getElementById("inputO"));
     const autoD = new google.maps.places.Autocomplete(document.getElementById("inputD"));
 
     autoO.addListener('place_changed', () => { 
         let place = autoO.getPlace();
-        if(place.geometry) { markerO.setPosition(place.geometry.location); map.setCenter(place.geometry.location); trazar(); }
+        if(place.geometry) { markerO.setPosition(place.geometry.location); map.setCenter(place.geometry.location); interactuado = true; trazar(); }
     });
     autoD.addListener('place_changed', () => { 
         let place = autoD.getPlace();
-        if(place.geometry) { markerD.setPosition(place.geometry.location); trazar(); }
+        if(place.geometry) { markerD.setPosition(place.geometry.location); interactuado = true; trazar(); }
     });
 
-    // Eventos de arrastre que disparan el trazo siempre
-    markerO.addListener('dragend', () => { reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
-    markerD.addListener('dragend', () => { reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
-
-    // Intento inicial por si ya hay valores
-    trazar();
+    markerO.addListener('dragend', () => { interactuado = true; reverseGeocode(markerO.getPosition(), 'inputO'); });
+    markerD.addListener('dragend', () => { interactuado = true; reverseGeocode(markerD.getPosition(), 'inputD'); });
 }
 
 function miUbicacion() {
@@ -193,8 +189,8 @@ function miUbicacion() {
             const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
             markerO.setPosition(pos);
             map.setCenter(pos);
+            interactuado = true;
             reverseGeocode(pos, 'inputO');
-            setTimeout(trazar, 500); // Pequeño delay para asegurar que reverseGeocode trabaje
         });
     }
 }
@@ -203,14 +199,13 @@ function reverseGeocode(pos, inputId) {
     geocoder.geocode({ location: pos }, (results, status) => {
         if (status === "OK" && results[0]) {
             document.getElementById(inputId).value = results[0].formatted_address;
-            trazar(); // Forzar el trazo después de obtener la dirección escrita
+            if(interactuado) trazar();
         }
     });
 }
 
 function trazar() {
-    // Verificamos que ambos pines tengan posición válida
-    if(!markerO.getPosition() || !markerD.getPosition()) return;
+    if(!interactuado) return; // No gasta créditos si el usuario no hizo nada
 
     directionsService.route({ 
         origin: markerO.getPosition(), 
@@ -239,7 +234,7 @@ function setServicio(tipo) {
     document.getElementById('avisoMoto').classList.toggle('hidden', tipo === 'tramite');
     document.getElementById('avisoPagoCompra').classList.toggle('hidden', tipo !== 'compra');
     document.getElementById('labelDetalle').innerText = (tipo === 'compra') ? "¿QUÉ COMPRAMOS?" : (tipo === 'tramite') ? "¿QUÉ TRÁMITES HACEMOS?" : "¿QUÉ LLEVAMOS?";
-    trazar();
+    if(interactuado) trazar();
 }
 
 function enviarWhatsApp() {
@@ -293,5 +288,5 @@ function enviarWhatsApp() {
 function ayudaInstalar() { alert("Para instalar:\niPhone: Compartir -> Pantalla de inicio.\nAndroid: 3 puntos -> Instalar."); }
 </script>
 </body>
-    </html>
-    
+                                                                                                                                           </html>
+                                                                                                                                           
