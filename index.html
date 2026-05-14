@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mandaditos App</title> 
 
-<!-- CONFIGURACIÓN PARA GUARDAR EN INICIO (PWA) -->
+<!-- PWA CONFIG -->
 <link rel="apple-touch-icon" href="png.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -22,45 +22,43 @@
     body { background-color: #f8fafc; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
     .app-container { max-width: 480px; margin: 0 auto; background: #ffffff; min-height: 100vh; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.05); padding-bottom: 80px; }
 
-    /* Overlay Fuera de Servicio */
     #overlay-cerrado { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .aviso-cerrado-card { background: #0f172a; color: white; padding: 45px 30px; border-radius: 35px; text-align: center; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.4); width: 100%; max-width: 340px; }
 
-    /* Header */
     .header-logo { height: 80px; width: auto; margin: 0 auto; }
     
-    /* Tabs */
     .tab-container { background: #f1f5f9; padding: 5px; border-radius: 18px; display: flex; gap: 4px; }
     .tab-btn { flex: 1; padding: 12px 5px; border-radius: 14px; font-weight: 700; font-size: 11px; transition: 0.3s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tab-active { background: #ffffff; color: #1e40af; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .tab-inactive { color: #64748b; }
 
-    /* Inputs */
     .label-pro { font-size: 10px; font-weight: 800; color: #1e40af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
     .input-pro { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 13px; font-weight: 500; outline: none; background: #fdfdfd; transition: 0.2s; }
     .input-pro:focus { border-color: #3b82f6; background: #fff; }
 
-    /* Mapa y Precio */
+    /* Estilo de Pasos */
+    .pasos-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 15px; margin-bottom: 20px; }
+    .paso-item { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px; }
+    .paso-n { background: #1e40af; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+
     #map-container { width: 100%; height: 260px; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; }
     .precio-card { background: #0f172a; color: white; padding: 15px; border-radius: 20px; text-align: center; margin-top: 10px; border: 3px solid #ffffff; box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1); width: 85%; margin-left: auto; margin-right: auto; }
 
-    /* Advertencias */
     .warning-box { background: #fff7ed; border: 1px solid #ffedd5; padding: 12px; border-radius: 15px; margin-top: 12px; display: flex; gap: 8px; }
     .warning-text { font-size: 11px; color: #9a3412; font-weight: 600; line-height: 1.4; }
 
-    /* Footer Social */
-    .social-footer { display: flex; justify-content: center; gap: 20px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
-    .social-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; transition: transform 0.2s; }
-    .social-icon:active { transform: scale(0.9); }
+    .social-footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+    .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+    .social-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
     .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     .fb { background: #1877F2; }
 
     .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 100%; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 </style>
 </head>
 <body onload="initMap()">
 
-<!-- PANTALLA FUERA DE SERVICIO -->
 <div id="overlay-cerrado">
     <div class="aviso-cerrado-card">
         <div class="mb-4 opacity-80"><i class="fas fa-motorcycle fa-3x text-red-500"></i></div>
@@ -79,14 +77,25 @@
         </div>
     </header>
 
-    <!-- TABS -->
+    <!-- BOTÓN INSTALAR APP -->
+    <button id="installBtn" class="btn-install mb-6">
+        <i class="fas fa-download"></i> INSTALAR APP EN MI CELULAR
+    </button>
+
     <nav class="tab-container mb-6">
         <button id="btnEnvio" onclick="setServicio('envio')" class="tab-btn tab-active"><i class="fas fa-box"></i> Envíos</button>
         <button id="btnCompra" onclick="setServicio('compra')" class="tab-btn tab-inactive"><i class="fas fa-shopping-cart"></i> Compras</button>
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive"><i class="fas fa-file-invoice"></i> Trámites</button>
     </nav>
 
-    <!-- DIRECCIONES -->
+    <!-- CARTEL DE LOS 4 PASOS -->
+    <div class="pasos-container">
+        <div class="paso-item"><span class="paso-n">1</span> Seleccioná el tipo de servicio arriba.</div>
+        <div class="paso-item"><span class="paso-n">2</span> Arrastrá los pines en el mapa (Azul: A / Rojo: B).</div>
+        <div class="paso-item"><span class="paso-n">3</span> Completá los datos de contacto con emojis.</div>
+        <div class="paso-item"><span class="paso-n">4</span> Presioná el botón verde para enviar por WhatsApp.</div>
+    </div>
+
     <div class="space-y-4 mb-4">
         <div>
             <label class="label-pro">📍 Punto A (Donde retiro) 🏍️</label>
@@ -98,21 +107,18 @@
         </div>
     </div>
 
-    <!-- MAPA -->
     <div id="map-container" class="shadow-sm">
         <div id="map" style="height: 100%; width: 100%;"></div>
     </div>
 
-    <!-- PRECIO -->
     <div class="precio-card">
         <span class="text-[9px] uppercase font-bold text-slate-400 tracking-[2px]">Costo Estimado</span>
         <div class="text-3xl font-black text-green-400 mt-1">$<span id="precioTotal">0</span></div>
     </div>
 
-    <!-- AVISO COMPRAS -->
     <div id="avisoCompra" class="warning-box hidden" style="background: #eff6ff; border-color: #dbeafe;">
         <i class="fas fa-info-circle text-blue-600"></i>
-        <p class="warning-text" style="color: #1e40af;">⚠️ Importante: Para compras, el servicio se abona **por adelantado** para confirmar la salida.</p>
+        <p class="warning-text" style="color: #1e40af;">⚠️ Importante: Para compras, el servicio se abona **por adelantado**.</p>
     </div>
 
     <!-- DATOS DE CONTACTO -->
@@ -121,7 +127,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="col-span-2">
                     <label class="label-pro">🙋‍♂️ Nombre Remitente (A)</label>
-                    <input id="fNombreO" type="text" placeholder="Nombre de quien entrega" class="input-pro">
+                    <input id="fNombreO" type="text" placeholder="Nombre de quien envía" class="input-pro">
                 </div>
                 <div class="col-span-2">
                     <label class="label-pro">📱 WhatsApp Remitente</label>
@@ -152,45 +158,41 @@
         </div>
     </div>
 
-    <!-- DESCRIPCIÓN -->
+    <!-- DESCRIPCIÓN DINÁMICA -->
     <div class="mt-6">
-        <label class="label-pro">📦 Detalles del Pedido</label>
-        <textarea id="obs" placeholder="Ej: Una caja de zapatos, llaves, un paquete..." class="input-pro h-24 resize-none"></textarea>
+        <label id="labelDetalle" class="label-pro">📦 Detalles del Pedido</label>
+        <textarea id="obs" placeholder="Ej: Una caja de zapatos..." class="input-pro h-24 resize-none"></textarea>
         
         <div class="warning-box">
             <i class="fas fa-box-open text-orange-500"></i>
-            <p class="warning-text">Solo productos **chicos o medianos**. No llevamos bultos grandes o muy pesados. 🚫📦</p>
+            <p class="warning-text">Solo productos **chicos o medianos**. No bultos grandes. 🚫📦</p>
         </div>
     </div>
 
     <!-- PAGO MERCADERIA -->
     <div id="pagoMercaderia" class="mt-6 p-4 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-        <label class="label-pro">💰 ¿Debemos pagar el producto al retirar?</label>
+        <label class="label-pro">💰 ¿Pagar producto al retirar?</label>
         <div class="flex justify-center gap-8 mt-2">
-            <label class="flex items-center gap-2 font-bold cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('montoBox').style.display='block'"> SÍ</label>
-            <label class="flex items-center gap-2 font-bold cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('montoBox').style.display='none'"> NO</label>
+            <label class="font-bold cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('montoBox').style.display='block'"> SÍ</label>
+            <label class="font-bold cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('montoBox').style.display='none'"> NO</label>
         </div>
         <div id="montoBox" class="hidden mt-4">
             <input id="fMonto" type="number" placeholder="¿Cuánto efectivo?" class="input-pro text-center text-blue-600 font-extrabold text-lg">
         </div>
     </div>
 
-    <!-- BOTÓN FINAL -->
     <div class="mt-8 px-2">
         <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl">
-            <i class="fab fa-whatsapp text-2xl"></i>
-            Confirmar Pedido
+            <i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO
         </button>
     </div>
 
-    <!-- REDES SOCIALES -->
     <footer class="social-footer">
-        <a href="https://instagram.com/mandaditos.posadas" target="_blank" class="social-icon ig shadow-md">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://facebook.com/mandaditos.posadas" target="_blank" class="social-icon fb shadow-md">
-            <i class="fab fa-facebook-f"></i>
-        </a>
+        <span class="label-pro">Seguinos en nuestras redes</span>
+        <div class="social-icons">
+            <a href="https://instagram.com/mandaditos.posadas" target="_blank" class="social-icon ig shadow-md"><i class="fab fa-instagram"></i></a>
+            <a href="https://facebook.com/mandaditos.posadas" target="_blank" class="social-icon fb shadow-md"><i class="fab fa-facebook-f"></i></a>
+        </div>
     </footer>
 
 </div>
@@ -198,9 +200,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
 
 <script>
-    // CONFIGURACIÓN DE DISPONIBILIDAD
-    let estoyTrabajando = true; // true = abierto, false = cerrado
-
+    let estoyTrabajando = true;
     let tipoServicio = 'envio';
     let costoEnvio = 0;
     let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
@@ -208,7 +208,6 @@
 
     function initMap() {
         if(!estoyTrabajando) document.getElementById('overlay-cerrado').style.display = 'flex';
-
         geocoder = new google.maps.Geocoder();
         directionsService = new google.maps.DirectionsService();
         directionsRenderer = new google.maps.DirectionsRenderer({ 
@@ -217,10 +216,7 @@
         });
 
         map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: -27.3670, lng: -55.8961 },
-            zoom: 14,
-            disableDefaultUI: true,
-            styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
+            center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true
         });
         directionsRenderer.setMap(map);
 
@@ -238,7 +234,7 @@
     }
 
     function trazar() {
-        if(!interactuado || !estoyTrabajando) return;
+        if(!interactuado) return;
         directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), travelMode: 'DRIVING' }, (res, stat) => {
             if (stat === 'OK') {
                 directionsRenderer.setDirections(res);
@@ -253,6 +249,18 @@
     function setServicio(tipo) {
         tipoServicio = tipo;
         ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(b => document.getElementById(b).className = b.includes(tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive");
+        
+        const labelDetalle = document.getElementById('labelDetalle');
+        const obsArea = document.getElementById('obs');
+
+        if(tipo === 'tramite') {
+            labelDetalle.innerText = "📂 Detalles del Trámite";
+            obsArea.placeholder = "Ej: Retirar documentos, retirar estudios médicos, pagar servicios...";
+        } else {
+            labelDetalle.innerText = "📦 Detalles del Pedido";
+            obsArea.placeholder = "Ej: Una caja de zapatos, llaves, un paquete...";
+        }
+
         document.getElementById('formEnvio').classList.toggle('hidden', tipo !== 'envio');
         document.getElementById('formSimple').classList.toggle('hidden', tipo === 'envio');
         document.getElementById('pagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
@@ -261,7 +269,6 @@
     }
 
     function enviarWhatsApp() {
-        if(!estoyTrabajando) return;
         const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
         let nomO = (tipoServicio === 'envio') ? document.getElementById('fNombreO').value : document.getElementById('fNombreS').value;
@@ -271,19 +278,16 @@
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? parseInt(document.getElementById('fMonto').value) || 0 : 0;
 
-        let txt = `*📋 NUEVO PEDIDO*%0A`;
-        txt += `*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A`;
-        txt += `*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 https://wa.me/${telO.replace(/\D/g,'')}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A`;
-        txt += `*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A`;
-        if(telD) txt += `📱 https://wa.me/${telD.replace(/\D/g,'')}%0A`;
-        txt += `🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A`;
-        txt += `*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A`;
-        txt += `*💰 COSTO ENVÍO: $${costoEnvio}*%0A`;
-        if(hayPago) txt += `🛒 PAGO RETIRO: $${monto}%0A`;
-        txt += `*💵 TOTAL COBRAR: $${costoEnvio + monto}*`;
+        let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
+        if(hayPago) txt += `%0A🛒 PAGO PRODUCTO: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
 
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
     }
+
+    // Lógica básica botón instalar
+    document.getElementById('installBtn').addEventListener('click', () => {
+        alert("Para instalar:\n1. Toca el botón de 'Compartir' (cuadrado con flecha).\n2. Selecciona 'Agregar a Inicio'.");
+    });
 </script>
 </body>
 </html>
