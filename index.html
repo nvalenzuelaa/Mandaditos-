@@ -36,7 +36,6 @@
     .input-pro { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 13px; font-weight: 500; outline: none; background: #fdfdfd; transition: 0.2s; }
     .input-pro:focus { border-color: #3b82f6; background: #fff; }
 
-    /* Estilo de Pasos */
     .pasos-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 15px; margin-bottom: 20px; }
     .paso-item { display: flex; align-items: flex-start; gap: 10px; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px; line-height: 1.3; }
     .paso-n { background: #1e40af; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: -1px; }
@@ -55,6 +54,9 @@
 
     .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 90%; margin: 20px auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    
+    /* Ajuste para sugerencias de Google Maps */
+    .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
 </style>
 </head>
 <body onload="initMap()">
@@ -83,7 +85,6 @@
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive"><i class="fas fa-file-invoice"></i> Trámites</button>
     </nav>
 
-    <!-- CARTEL DE LOS 4 PASOS ACTUALIZADO -->
     <div class="pasos-container">
         <div class="paso-item"><span class="paso-n">1</span> Seleccionar tipo de servicio.</div>
         <div class="paso-item"><span class="paso-n">2</span> Arrastrar los pines del mapa en la dirección exacta o escribirlo manualmente.</div>
@@ -94,11 +95,11 @@
     <div class="space-y-4 mb-4">
         <div>
             <label class="label-pro">📍 Punto A (Donde retiro) 🏍️</label>
-            <input id="inputO" type="text" placeholder="Escriba o mueva el pin azul..." class="input-pro">
+            <input id="inputO" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
         <div>
             <label class="label-pro">🏁 Punto B (Donde entrego) 📦</label>
-            <input id="inputD" type="text" placeholder="Escriba o mueva el pin rojo..." class="input-pro">
+            <input id="inputD" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
     </div>
 
@@ -116,7 +117,6 @@
         <p class="warning-text" style="color: #1e40af;">⚠️ Importante: Para compras, el servicio se abona **por adelantado**.</p>
     </div>
 
-    <!-- DATOS DE CONTACTO -->
     <div id="formEnvio" class="mt-6 space-y-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
             <div class="grid grid-cols-2 gap-3">
@@ -156,7 +156,6 @@
     <div class="mt-6">
         <label id="labelDetalle" class="label-pro">📦 Detalles del Pedido</label>
         <textarea id="obs" placeholder="Ej: Una caja de zapatos..." class="input-pro h-24 resize-none"></textarea>
-        
         <div class="warning-box">
             <i class="fas fa-box-open text-orange-500"></i>
             <p class="warning-text">Solo productos **chicos o medianos**. No bultos grandes. 🚫📦</p>
@@ -180,7 +179,6 @@
         </button>
     </div>
 
-    <!-- SECCIÓN DE INSTALACIÓN Y REDES -->
     <button id="installBtn" class="btn-install">
         <i class="fas fa-download"></i> INSTALAR APP EN MI CELULAR
     </button>
@@ -223,6 +221,38 @@
 
         markerO.addListener('dragend', () => { interactuado=true; reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
         markerD.addListener('dragend', () => { interactuado=true; reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
+
+        // CONFIGURACIÓN DE AUTOCOMPLETE CON RESTRICCIONES
+        const options = {
+            componentRestrictions: { country: "ar" },
+            fields: ["address_components", "geometry", "icon", "name"],
+            strictBounds: false,
+            // Centrado en Posadas/Garupá/Candelaria
+            locationRestriction: {
+                north: -27.3, south: -27.6, east: -55.7, west: -56.1
+            }
+        };
+
+        const autoO = new google.maps.places.Autocomplete(document.getElementById('inputO'), options);
+        const autoD = new google.maps.places.Autocomplete(document.getElementById('inputD'), options);
+
+        autoO.addListener('place_changed', () => {
+            const place = autoO.getPlace();
+            if (!place.geometry) return;
+            markerO.setPosition(place.geometry.location);
+            map.panTo(place.geometry.location);
+            interactuado = true;
+            trazar();
+        });
+
+        autoD.addListener('place_changed', () => {
+            const place = autoD.getPlace();
+            if (!place.geometry) return;
+            markerD.setPosition(place.geometry.location);
+            map.panTo(place.geometry.location);
+            interactuado = true;
+            trazar();
+        });
     }
 
     function reverseGeocode(pos, inputId) {
@@ -247,18 +277,15 @@
     function setServicio(tipo) {
         tipoServicio = tipo;
         ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(b => document.getElementById(b).className = b.includes(tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive");
-        
         const labelDetalle = document.getElementById('labelDetalle');
         const obsArea = document.getElementById('obs');
-
         if(tipo === 'tramite') {
             labelDetalle.innerText = "📂 Detalles del Trámite";
-            obsArea.placeholder = "Ej: Retirar documentos, retirar estudios médicos, pagar servicios...";
+            obsArea.placeholder = "Ej: Retirar documentos, retirar estudios médicos...";
         } else {
             labelDetalle.innerText = "📦 Detalles del Pedido";
-            obsArea.placeholder = "Ej: Una caja de zapatos, llaves, un paquete...";
+            obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
         }
-
         document.getElementById('formEnvio').classList.toggle('hidden', tipo !== 'envio');
         document.getElementById('formSimple').classList.toggle('hidden', tipo === 'envio');
         document.getElementById('pagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
@@ -275,15 +302,13 @@
         let telD = (tipoServicio === 'envio') ? document.getElementById('fTelD').value : "";
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? parseInt(document.getElementById('fMonto').value) || 0 : 0;
-
         let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
         if(hayPago) txt += `%0A🛒 PAGO PRODUCTO: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
-
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
     }
 
     document.getElementById('installBtn').addEventListener('click', () => {
-        alert("Para instalar:\n1. Toca el botón de 'Compartir' (iPhone) o los 'Puntos de menú' (Android).\n2. Selecciona 'Agregar a Inicio'.");
+        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona 'Agregar a Inicio'.");
     });
 </script>
 </body>
