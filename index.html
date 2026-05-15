@@ -42,17 +42,17 @@
     .warning-box { background: #fff7ed; border: 1px solid #ffedd5; padding: 12px; border-radius: 15px; margin-top: 12px; display: flex; gap: 8px; }
     .warning-text { font-size: 11px; color: #9a3412; font-weight: 600; line-height: 1.4; }
 
+    .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-cancel { background: #dc2626; color: white; padding: 10px; border-radius: 15px; font-weight: 700; width: 50%; margin: 10px auto 0 auto; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 10px; opacity: 0.8; }
+    
+    .btn-extra { border: 2px dashed #1e40af; color: #1e40af; padding: 10px; border-radius: 14px; font-size: 11px; font-weight: 800; width: 100%; margin-top: 10px; transition: 0.2s; }
+    .btn-extra.active { background: #1e40af; color: white; border-style: solid; }
+
     .social-footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
     .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
     .social-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
     .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     .fb { background: #1877F2; }
-
-    .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .btn-cancel { background: #dc2626; color: white; padding: 10px; border-radius: 15px; font-weight: 700; width: 50%; margin: 10px auto 0 auto; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 10px; opacity: 0.8; }
-    .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 90%; margin: 20px auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-    .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
 </style>
 </head>
 <body onload="initMap()">
@@ -61,10 +61,6 @@
 
     <header class="text-center mb-6">
         <img src="png.png" alt="Logo" class="header-logo">
-        <div class="flex items-center justify-center gap-2 mt-2 opacity-70">
-            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Servicio Activo</span>
-        </div>
     </header>
 
     <nav class="tab-container mb-6">
@@ -73,22 +69,25 @@
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive"><i class="fas fa-file-invoice"></i> Trámites</button>
     </nav>
 
-    <div class="pasos-container">
-        <div class="paso-item"><span class="paso-n">1</span> Seleccionar tipo de servicio.</div>
-        <div class="paso-item"><span class="paso-n">2</span> Arrastrar los pines del mapa en la dirección exacta o escribirlo manualmente.</div>
-        <div class="paso-item"><span class="paso-n">3</span> Completar los datos de contacto.</div>
-        <div class="paso-item"><span class="paso-n">4</span> Confirmar y enviar el pedido al WhatsApp de mandaditos.</div>
-    </div>
-
     <div class="space-y-4 mb-4">
         <div>
             <label class="label-pro">📍 Punto A (Donde retiro/compro) 🏍️</label>
             <input id="inputO" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
+        
+        <div id="boxExtra" class="hidden animate-pulse">
+            <label class="label-pro text-orange-600">➕ Punto Extra (Segunda parada)</label>
+            <input id="inputE" type="text" placeholder="Escriba la parada intermedia..." class="input-pro border-orange-300">
+        </div>
+
         <div>
             <label class="label-pro">🏁 Punto B (Donde entrego) 🏠</label>
             <input id="inputD" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
+
+        <button id="btnToggleExtra" onclick="toggleExtra()" class="btn-extra">
+            <i class="fas fa-plus-circle"></i> + AGREGAR PARADA EXTRA
+        </button>
     </div>
 
     <div id="map-container" class="shadow-sm">
@@ -108,36 +107,18 @@
     <div id="formEnvio" class="mt-6 space-y-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
             <div class="grid grid-cols-2 gap-3">
-                <div class="col-span-2">
-                    <label class="label-pro">🙋‍♂️ Nombre Remitente (A)</label>
-                    <input id="fNombreO" type="text" placeholder="Nombre de quien envía" class="input-pro">
-                </div>
-                <div class="col-span-2">
-                    <label class="label-pro">📱 WhatsApp Remitente</label>
-                    <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-pro">
-                </div>
-                <div class="col-span-2">
-                    <label class="label-pro">👤 Nombre Destinatario (B)</label>
-                    <input id="fNombreD" type="text" placeholder="Nombre de quien recibe" class="input-pro">
-                </div>
-                <div class="col-span-2">
-                    <label class="label-pro">📞 WhatsApp Destinatario</label>
-                    <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-pro">
-                </div>
+                <div class="col-span-2"><label class="label-pro">🙋‍♂️ Nombre Remitente (A)</label><input id="fNombreO" type="text" class="input-pro"></div>
+                <div class="col-span-2"><label class="label-pro">📱 WhatsApp Remitente</label><input id="fTelO" type="tel" class="input-pro"></div>
+                <div class="col-span-2"><label class="label-pro">👤 Nombre Destinatario (B)</label><input id="fNombreD" type="text" class="input-pro"></div>
+                <div class="col-span-2"><label class="label-pro">📞 WhatsApp Destinatario</label><input id="fTelD" type="tel" class="input-pro"></div>
             </div>
         </div>
     </div>
 
     <div id="formSimple" class="hidden mt-6 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
         <div class="grid grid-cols-2 gap-3">
-            <div class="col-span-2">
-                <label class="label-pro">🙋‍♂️ Tu Nombre (Solicitante)</label>
-                <input id="fNombreS" type="text" placeholder="Tu nombre" class="input-pro">
-            </div>
-            <div class="col-span-2">
-                <label class="label-pro">📱 Tu WhatsApp</label>
-                <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-pro">
-            </div>
+            <div class="col-span-2"><label class="label-pro">🙋‍♂️ Tu Nombre (Solicitante)</label><input id="fNombreS" type="text" class="input-pro"></div>
+            <div class="col-span-2"><label class="label-pro">📱 Tu WhatsApp</label><input id="fTelS" type="tel" class="input-pro"></div>
         </div>
     </div>
 
@@ -158,26 +139,16 @@
     </div>
 
     <div class="mt-8 px-2 flex flex-col items-center">
-        <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl mb-3">
-            <i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO
-        </button>
-        <button onclick="cancelarPedido()" class="btn-cancel">
-            <i class="fas fa-times"></i> Cancelar pedido
-        </button>
+        <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl mb-3"><i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO</button>
+        <button onclick="cancelarPedido()" class="btn-cancel"><i class="fas fa-times"></i> Cancelar pedido</button>
     </div>
 
-    <button id="installBtn" class="btn-install">
-        <i class="fas fa-download"></i> INSTALAR APP EN MI CELULAR
-    </button>
-
     <footer class="social-footer">
-        <span class="label-pro">Seguinos en nuestras redes</span>
         <div class="social-icons">
             <a href="https://instagram.com/mandaditos.posadas" target="_blank" class="social-icon ig shadow-md"><i class="fab fa-instagram"></i></a>
             <a href="https://facebook.com/mandaditos.posadas" target="_blank" class="social-icon fb shadow-md"><i class="fab fa-facebook-f"></i></a>
         </div>
     </footer>
-
 </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzsxnmmifNkfPptHzLdFyz_v26u9wdKCU&libraries=places"></script>
@@ -185,45 +156,39 @@
 <script>
     let tipoServicio = 'envio';
     let costoEnvio = 0;
-    let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
+    let tieneExtra = false;
+    let map, directionsService, directionsRenderer, markerO, markerD, markerE, geocoder;
     let interactuado = false;
 
     function initMap() {
         geocoder = new google.maps.Geocoder();
         directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({ 
-            polylineOptions: { strokeColor: "#1e40af", strokeWeight: 5 }, 
-            suppressMarkers: true 
-        });
-
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true
-        });
+        directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#1e40af", strokeWeight: 5 }, suppressMarkers: true });
+        map = new google.maps.Map(document.getElementById("map"), { center: { lat: -27.3670, lng: -55.8961 }, zoom: 14, disableDefaultUI: true });
         directionsRenderer.setMap(map);
 
         markerO = new google.maps.Marker({ position: { lat: -27.3665, lng: -55.8955 }, map, draggable: true });
         markerD = new google.maps.Marker({ position: { lat: -27.3675, lng: -55.8965 }, map, draggable: true });
+        markerE = new google.maps.Marker({ position: { lat: -27.3670, lng: -55.8960 }, map, draggable: true, visible: false, icon: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png' });
 
-        markerO.addListener('dragend', () => { interactuado=true; reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
-        markerD.addListener('dragend', () => { interactuado=true; reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
+        [markerO, markerD, markerE].forEach(m => m.addListener('dragend', () => { 
+            interactuado=true; 
+            if(m === markerO) reverseGeocode(m.getPosition(), 'inputO');
+            if(m === markerD) reverseGeocode(m.getPosition(), 'inputD');
+            if(m === markerE) reverseGeocode(m.getPosition(), 'inputE');
+            trazar(); 
+        }));
 
-        const options = {
-            componentRestrictions: { country: "ar" },
-            fields: ["address_components", "geometry", "name"],
-            locationRestriction: { north: -27.3, south: -27.6, east: -55.7, west: -56.1 }
-        };
-
-        const autoO = new google.maps.places.Autocomplete(document.getElementById('inputO'), options);
-        const autoD = new google.maps.places.Autocomplete(document.getElementById('inputD'), options);
-
-        autoO.addListener('place_changed', () => {
-            const place = autoO.getPlace();
-            if (place.geometry) { markerO.setPosition(place.geometry.location); map.panTo(place.geometry.location); interactuado = true; trazar(); }
-        });
-
-        autoD.addListener('place_changed', () => {
-            const place = autoD.getPlace();
-            if (place.geometry) { markerD.setPosition(place.geometry.location); map.panTo(place.geometry.location); interactuado = true; trazar(); }
+        const options = { componentRestrictions: { country: "ar" }, locationRestriction: { north: -27.3, south: -27.6, east: -55.7, west: -56.1 } };
+        ['inputO', 'inputD', 'inputE'].forEach(id => {
+            const auto = new google.maps.places.Autocomplete(document.getElementById(id), options);
+            auto.addListener('place_changed', () => {
+                const place = auto.getPlace();
+                if (place.geometry) {
+                    const m = (id==='inputO') ? markerO : (id==='inputD') ? markerD : markerE;
+                    m.setPosition(place.geometry.location); map.panTo(place.geometry.location); interactuado = true; trazar();
+                }
+            });
         });
     }
 
@@ -233,15 +198,26 @@
         });
     }
 
+    function toggleExtra() {
+        tieneExtra = !tieneExtra;
+        document.getElementById('boxExtra').classList.toggle('hidden', !tieneExtra);
+        document.getElementById('btnToggleExtra').classList.toggle('active', tieneExtra);
+        document.getElementById('btnToggleExtra').innerHTML = tieneExtra ? '<i class="fas fa-minus-circle"></i> QUITAR PARADA EXTRA' : '<i class="fas fa-plus-circle"></i> + AGREGAR PARADA EXTRA';
+        markerE.setVisible(tieneExtra);
+        trazar();
+    }
+
     function trazar() {
         if(!interactuado) return;
-        directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), travelMode: 'DRIVING' }, (res, stat) => {
+        const waypoints = tieneExtra ? [{ location: markerE.getPosition(), stopover: true }] : [];
+        directionsService.route({ origin: markerO.getPosition(), destination: markerD.getPosition(), waypoints: waypoints, travelMode: 'DRIVING' }, (res, stat) => {
             if (stat === 'OK') {
                 directionsRenderer.setDirections(res);
-                let kms = (res.routes[0].legs[0].distance.value / 1000);
-                let baseDistancia = 3000;
-                let adicionalServicio = (tipoServicio === 'envio') ? 0 : 4000;
-                costoEnvio = Math.ceil((baseDistancia + (kms * 350) + adicionalServicio) / 100) * 100;
+                let kms = res.routes[0].legs.reduce((acc, leg) => acc + leg.distance.value, 0) / 1000;
+                let base = 3000;
+                let plusServicio = (tipoServicio === 'envio') ? 0 : 4000;
+                let plusExtra = tieneExtra ? 1500 : 0; // Costo por parada extra
+                costoEnvio = Math.ceil((base + (kms * 350) + plusServicio + plusExtra) / 100) * 100;
                 document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             }
         });
@@ -250,96 +226,44 @@
     function setServicio(tipo) {
         tipoServicio = tipo;
         ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(b => document.getElementById(b).className = b.includes(tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive");
+        document.getElementById('btnToggleExtra').style.display = (tipo === 'compra') ? 'none' : 'block';
+        if(tipo === 'compra' && tieneExtra) toggleExtra();
         
-        const labelDetalle = document.getElementById('labelDetalle');
-        const obsArea = document.getElementById('obs');
-        const labelPago = document.getElementById('labelPago');
-
-        if(tipo === 'tramite') {
-            labelDetalle.innerText = "📂 Detalles del Trámite";
-            obsArea.placeholder = "Ej: Retirar documentos, pagar boleta de luz...";
-            labelPago.innerText = "💰 ¿Hay que pagar algo?";
-            document.getElementById('pagoMercaderia').classList.remove('hidden');
-        } else if(tipo === 'compra') {
-            labelDetalle.innerText = "🛒 Lista de Compra";
-            obsArea.placeholder = "Ej: 1 Leche, 1 Pan, 1 tira de paracetamol...";
-            // Ocultamos la caja de pago en compras por ser redundante
-            document.getElementById('pagoMercaderia').classList.add('hidden');
-        } else {
-            labelDetalle.innerText = "📦 Detalles del Envío";
-            obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
-            labelPago.innerText = "💰 ¿Pagar producto al retirar?";
-            document.getElementById('pagoMercaderia').classList.remove('hidden');
-        }
-
         document.getElementById('formEnvio').classList.toggle('hidden', tipo !== 'envio');
         document.getElementById('formSimple').classList.toggle('hidden', tipo === 'envio');
+        document.getElementById('pagoMercaderia').classList.toggle('hidden', tipo === 'compra');
         document.getElementById('avisoCompra').classList.toggle('hidden', tipo !== 'compra');
-        
-        if(interactuado) trazar();
+        trazar();
     }
 
     function enviarWhatsApp() {
-        const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
-        const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
-
+        const linkO = `http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+        const linkD = `http://maps.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+        const linkE = `http://maps.google.com/maps?q=${markerE.getPosition().lat()},${markerE.getPosition().lng()}`;
+        
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
-        const monto = hayPago ? (parseInt(document.getElementById('fMonto').value) || 0) : 0;
-        const detalles = document.getElementById('obs').value;
-        const dirA = document.getElementById('inputO').value;
-        const dirB = document.getElementById('inputD').value;
-
+        const monto = hayPago ? (document.getElementById('fMonto').value || 0) : 0;
         let txt = `*📋 NUEVO PEDIDO: ${tipoServicio.toUpperCase()}*%0A%0A`;
 
         if (tipoServicio === 'envio') {
-            const nomO = document.getElementById('fNombreO').value;
-            const telO = document.getElementById('fTelO').value;
-            const nomD = document.getElementById('fNombreD').value;
-            const telD = document.getElementById('fTelD').value;
-
-            txt += `*📍 PUNTO A (Retiro):*%0A🏠 ${dirA}%0A👤 ${nomO}%0A📱 ${telO}%0A🗺️ ${linkO}%0A%0A`;
-            txt += `*🏁 PUNTO B (Entrega):*%0A🏠 ${dirB}%0A👤 ${nomD}%0A📱 ${telD}%0A🗺️ ${linkD}%0A%0A`;
-            txt += `*📦 DETALLES:* ${detalles}%0A%0A`;
-            txt += `*💰 COSTO ENVÍO: $${costoEnvio}*`;
-            if(hayPago) {
-                txt += `%0A🛒 PRODUCTO: $${monto}%0A💵 TOTAL A COBRAR: $${costoEnvio + monto}`;
-            }
-        } 
-        else if (tipoServicio === 'compra') {
-            const nomS = document.getElementById('fNombreS').value;
-            const telS = document.getElementById('fTelS').value;
-
-            txt += `*🛒 LUGAR DE COMPRA (A):*%0A🏠 ${dirA}%0A🗺️ ${linkO}%0A%0A`;
-            txt += `*🏠 DIRECCIÓN DE ENTREGA (B):*%0A🏠 ${dirB}%0A🗺️ ${linkD}%0A%0A`;
-            txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
-            txt += `*📝 LISTA:* ${detalles}%0A%0A`;
-            txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
-            txt += `%0A%0A⚠️ *NOTA:* Para confirmar, el servicio se abona por adelantado.`;
-        } 
-        else if (tipoServicio === 'tramite') {
-            const nomS = document.getElementById('fNombreS').value;
-            const telS = document.getElementById('fTelS').value;
-
-            txt += `*📍 PUNTO A (Donde se realiza):*%0A🏠 ${dirA}%0A🗺️ ${linkO}%0A%0A`;
-            txt += `*🏁 PUNTO B (Destino final):*%0A🏠 ${dirB}%0A🗺️ ${linkD}%0A%0A`;
-            txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
-            txt += `*📂 DETALLES:* ${detalles}%0A%0A`;
-            txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
-            if(hayPago) txt += `%0A🛒 GASTO TRÁMITE: $${monto}`;
+            txt += `*📍 PUNTO A (Retiro):*%0A🏠 ${document.getElementById('inputO').value}%0A👤 ${document.getElementById('fNombreO').value}%0A📱 ${document.getElementById('fTelO').value}%0A🗺️ ${linkO}%0A%0A`;
+            if(tieneExtra) txt += `*➕ PARADA EXTRA:*%0A🏠 ${document.getElementById('inputE').value}%0A🗺️ ${linkE}%0A%0A`;
+            txt += `*🏁 PUNTO B (Entrega):*%0A🏠 ${document.getElementById('inputD').value}%0A👤 ${document.getElementById('fNombreD').value}%0A📱 ${document.getElementById('fTelD').value}%0A🗺️ ${linkD}%0A%0A`;
+        } else if (tipoServicio === 'compra') {
+            txt += `*🛒 COMPRA EN (A):* ${document.getElementById('inputO').value}%0A*🏠 ENTREGA EN (B):* ${document.getElementById('inputD').value}%0A👤 ${document.getElementById('fNombreS').value}%0A📱 ${document.getElementById('fTelS').value}%0A%0A*📝 LISTA:* ${document.getElementById('obs').value}%0A%0A⚠️ Servicio se abona por adelantado.`;
+        } else {
+            txt += `*📍 PUNTO A:* ${document.getElementById('inputO').value}%0A`;
+            if(tieneExtra) txt += `*➕ PARADA EXTRA:* ${document.getElementById('inputE').value}%0A`;
+            txt += `*🏁 PUNTO B:* ${document.getElementById('inputD').value}%0A👤 ${document.getElementById('fNombreS').value}%0A📱 ${document.getElementById('fTelS').value}%0A%0A*📂 TRÁMITE:* ${document.getElementById('obs').value}`;
         }
+
+        txt += `%0A%0A*💰 COSTO ENVÍO: $${costoEnvio}*`;
+        if(hayPago && tipoServicio !== 'compra') txt += `%0A🛒 PRODUCTO/TRÁMITE: $${monto}%0A💵 TOTAL: $${costoEnvio + parseInt(monto)}`;
 
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
     }
 
-    function cancelarPedido() {
-        if(confirm("¿Estás seguro que deseas cancelar?")) {
-            location.reload();
-        }
-    }
-
-    document.getElementById('installBtn').addEventListener('click', () => {
-        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona 'Agregar a Inicio'.");
-    });
+    function cancelarPedido() { if(confirm("¿Cancelar pedido?")) location.reload(); }
 </script>
 </body>
 </html>
