@@ -44,12 +44,15 @@
 
     .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .btn-cancel { background: #dc2626; color: white; padding: 10px; border-radius: 15px; font-weight: 700; width: 50%; margin: 10px auto 0 auto; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 10px; opacity: 0.8; }
+    .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 90%; margin: 20px auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     .social-footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
     .social-icons { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
     .social-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
     .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     .fb { background: #1877F2; }
+
+    .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
 </style>
 </head>
 <body onload="initMap()">
@@ -58,6 +61,10 @@
 
     <header class="text-center mb-6">
         <img src="png.png" alt="Logo" class="header-logo">
+        <div class="flex items-center justify-center gap-2 mt-2 opacity-70">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Servicio Activo</span>
+        </div>
     </header>
 
     <nav class="tab-container mb-6">
@@ -66,9 +73,16 @@
         <button id="btnTramite" onclick="setServicio('tramite')" class="tab-btn tab-inactive"><i class="fas fa-file-invoice"></i> Trámites</button>
     </nav>
 
+    <div class="pasos-container">
+        <div class="paso-item"><span class="paso-n">1</span> Seleccionar tipo de servicio.</div>
+        <div class="paso-item"><span class="paso-n">2</span> Arrastrar los pines del mapa en la dirección exacta o escribirlo manualmente.</div>
+        <div class="paso-item"><span class="paso-n">3</span> Completar los datos de contacto.</div>
+        <div class="paso-item"><span class="paso-n">4</span> Confirmar y enviar el pedido al WhatsApp de mandaditos.</div>
+    </div>
+
     <div class="space-y-4 mb-4">
         <div>
-            <label class="label-pro">📍 Punto A (Donde retiro/compro) 🏍️</label>
+            <label class="label-pro">📍 Punto A (Donde retiro) 🏍️</label>
             <input id="inputO" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
         <div>
@@ -94,18 +108,36 @@
     <div id="formEnvio" class="mt-6 space-y-4">
         <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
             <div class="grid grid-cols-2 gap-3">
-                <div class="col-span-2"><label class="label-pro">🙋‍♂️ Nombre Remitente (A)</label><input id="fNombreO" type="text" class="input-pro"></div>
-                <div class="col-span-2"><label class="label-pro">📱 WhatsApp Remitente</label><input id="fTelO" type="tel" class="input-pro"></div>
-                <div class="col-span-2"><label class="label-pro">👤 Nombre Destinatario (B)</label><input id="fNombreD" type="text" class="input-pro"></div>
-                <div class="col-span-2"><label class="label-pro">📞 WhatsApp Destinatario</label><input id="fTelD" type="tel" class="input-pro"></div>
+                <div class="col-span-2">
+                    <label class="label-pro">🙋‍♂️ Nombre Remitente (A)</label>
+                    <input id="fNombreO" type="text" placeholder="Nombre de quien envía" class="input-pro">
+                </div>
+                <div class="col-span-2">
+                    <label class="label-pro">📱 WhatsApp Remitente</label>
+                    <input id="fTelO" type="tel" placeholder="WhatsApp" class="input-pro">
+                </div>
+                <div class="col-span-2">
+                    <label class="label-pro">👤 Nombre Destinatario (B)</label>
+                    <input id="fNombreD" type="text" placeholder="Nombre de quien recibe" class="input-pro">
+                </div>
+                <div class="col-span-2">
+                    <label class="label-pro">📞 WhatsApp Destinatario</label>
+                    <input id="fTelD" type="tel" placeholder="WhatsApp" class="input-pro">
+                </div>
             </div>
         </div>
     </div>
 
     <div id="formSimple" class="hidden mt-6 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
         <div class="grid grid-cols-2 gap-3">
-            <div class="col-span-2"><label class="label-pro">🙋‍♂️ Tu Nombre (Solicitante)</label><input id="fNombreS" type="text" class="input-pro"></div>
-            <div class="col-span-2"><label class="label-pro">📱 Tu WhatsApp</label><input id="fTelS" type="tel" class="input-pro"></div>
+            <div class="col-span-2">
+                <label class="label-pro">🙋‍♂️ Tu Nombre (Solicitante)</label>
+                <input id="fNombreS" type="text" placeholder="Tu nombre" class="input-pro">
+            </div>
+            <div class="col-span-2">
+                <label class="label-pro">📱 Tu WhatsApp</label>
+                <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-pro">
+            </div>
         </div>
     </div>
 
@@ -134,7 +166,12 @@
         <button onclick="cancelarPedido()" class="btn-cancel"><i class="fas fa-times"></i> Cancelar pedido</button>
     </div>
 
+    <button id="installBtn" class="btn-install">
+        <i class="fas fa-download"></i> INSTALAR APP EN MI CELULAR
+    </button>
+
     <footer class="social-footer">
+        <span class="label-pro">Seguinos en nuestras redes</span>
         <div class="social-icons">
             <a href="https://instagram.com/mandaditos.posadas" target="_blank" class="social-icon ig shadow-md"><i class="fab fa-instagram"></i></a>
             <a href="https://facebook.com/mandaditos.posadas" target="_blank" class="social-icon fb shadow-md"><i class="fab fa-facebook-f"></i></a>
@@ -208,16 +245,25 @@
         document.getElementById('avisoCompra').classList.toggle('hidden', tipo !== 'compra');
         
         const labelDetalle = document.getElementById('labelDetalle');
-        if(tipo === 'tramite') labelDetalle.innerText = "📂 Detalles del Trámite";
-        else if(tipo === 'compra') labelDetalle.innerText = "🛒 Lista de Compra";
-        else labelDetalle.innerText = "📦 Detalles del Envío";
+        const obsArea = document.getElementById('obs');
+
+        if(tipo === 'tramite') {
+            labelDetalle.innerText = "📂 Detalles del Trámite";
+            obsArea.placeholder = "Ej: Retirar documentos, pagar boleta de luz...";
+        } else if(tipo === 'compra') {
+            labelDetalle.innerText = "🛒 Lista de Compra";
+            obsArea.placeholder = "Ej: 1 Leche, 1 Pan, 1 tira de paracetamol...";
+        } else {
+            labelDetalle.innerText = "📦 Detalles del Envío";
+            obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
+        }
 
         if(interactuado) trazar();
     }
 
     function enviarWhatsApp() {
-        const linkO = `http://maps.google.com/?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
-        const linkD = `http://maps.google.com/?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+        const linkO = `http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+        const linkD = `http://maps.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? (document.getElementById('fMonto').value || 0) : 0;
         
@@ -226,6 +272,7 @@
         if (tipoServicio === 'envio') {
             txt += `*📍 PUNTO A (Retiro):*%0A🏠 ${document.getElementById('inputO').value}%0A👤 ${document.getElementById('fNombreO').value}%0A📱 ${document.getElementById('fTelO').value}%0A🗺️ ${linkO}%0A%0A`;
             txt += `*🏁 PUNTO B (Entrega):*%0A🏠 ${document.getElementById('inputD').value}%0A👤 ${document.getElementById('fNombreD').value}%0A📱 ${document.getElementById('fTelD').value}%0A🗺️ ${linkD}%0A%0A`;
+            txt += `*📦 DETALLES:* ${document.getElementById('obs').value}%0A%0A`;
         } else if (tipoServicio === 'compra') {
             txt += `*🛒 COMPRAR EN (A):* ${document.getElementById('inputO').value}%0A*🏠 ENTREGAR EN (B):* ${document.getElementById('inputD').value}%0A👤 ${document.getElementById('fNombreS').value}%0A📱 ${document.getElementById('fTelS').value}%0A%0A*📝 LISTA:* ${document.getElementById('obs').value}%0A%0A⚠️ Servicio se abona por adelantado.`;
         } else {
@@ -240,6 +287,10 @@
     }
 
     function cancelarPedido() { if(confirm("¿Cancelar?")) location.reload(); }
+
+    document.getElementById('installBtn').addEventListener('click', () => {
+        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona 'Agregar a Inicio'.");
+    });
 </script>
 </body>
 </html>
