@@ -52,6 +52,7 @@
     .fb { background: #1877F2; }
 
     .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-cancel { background: #dc2626; color: white; padding: 12px; border-radius: 15px; font-weight: 700; width: 60%; margin: 15px auto 0 auto; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; }
     .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 90%; margin: 20px auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
@@ -171,9 +172,12 @@
         </div>
     </div>
 
-    <div class="mt-8 px-2">
-        <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl">
+    <div class="mt-8 px-2 flex flex-col items-center">
+        <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl mb-3">
             <i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO
+        </button>
+        <button onclick="cancelarPedido()" class="btn-cancel shadow-md">
+            <i class="fas fa-times"></i> Cancelar pedido
         </button>
     </div>
 
@@ -263,13 +267,10 @@
             if (stat === 'OK') {
                 directionsRenderer.setDirections(res);
                 let kms = (res.routes[0].legs[0].distance.value / 1000);
-                
-                // CALCULO MEJORADO:
-                // Si es Envío: 3000 base + kms
-                // Si es Compra/Trámite: 3000 base + kms + 4000 servicio fijo
+
                 let baseDistancia = 3000;
                 let adicionalServicio = (tipoServicio === 'envio') ? 0 : 4000;
-                
+
                 costoEnvio = Math.ceil((baseDistancia + (kms * 350) + adicionalServicio) / 100) * 100;
                 document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             }
@@ -298,7 +299,7 @@
     function enviarWhatsApp() {
         const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
-        
+
         let nomO = (tipoServicio === 'envio') ? document.getElementById('fNombreO').value : document.getElementById('fNombreS').value;
         let telO = (tipoServicio === 'envio') ? document.getElementById('fTelO').value : document.getElementById('fTelS').value;
         let nomD = (tipoServicio === 'envio') ? document.getElementById('fNombreD').value : "Moto Mandaditos";
@@ -306,12 +307,21 @@
 
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? parseInt(document.getElementById('fMonto').value) || 0 : 0;
-        
+
         let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A📱 ${telD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
-        
+
         if(hayPago) txt += `%0A🛒 PAGO PRODUCTO: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
-        
+
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
+    }
+
+    function cancelarPedido() {
+        if(confirm("¿Estás seguro que deseas cancelar? Se borrarán los datos.")) {
+            // Muestra el overlay de "cerrado" para simular que salió de la app
+            document.getElementById('overlay-cerrado').style.display = 'flex';
+            // Opcional: Recargar la página después de un momento para limpiar todo
+            setTimeout(() => { location.reload(); }, 3000);
+        }
     }
 
     document.getElementById('installBtn').addEventListener('click', () => {
