@@ -221,12 +221,10 @@
         markerO.addListener('dragend', () => { interactuado=true; reverseGeocode(markerO.getPosition(), 'inputO'); trazar(); });
         markerD.addListener('dragend', () => { interactuado=true; reverseGeocode(markerD.getPosition(), 'inputD'); trazar(); });
 
-        // CONFIGURACIÓN DE AUTOCOMPLETE CON RESTRICCIONES
         const options = {
             componentRestrictions: { country: "ar" },
             fields: ["address_components", "geometry", "icon", "name"],
             strictBounds: false,
-            // Centrado en Posadas/Garupá/Candelaria
             locationRestriction: {
                 north: -27.3, south: -27.6, east: -55.7, west: -56.1
             }
@@ -266,7 +264,10 @@
             if (stat === 'OK') {
                 directionsRenderer.setDirections(res);
                 let kms = (res.routes[0].legs[0].distance.value / 1000);
-                let base = (tipoServicio === 'envio') ? 3000 : 5000;
+                
+                // ACTUALIZACIÓN DE PRECIOS: Base 3000 envíos, 4000 resto.
+                let base = (tipoServicio === 'envio') ? 3000 : 4000;
+                
                 costoEnvio = Math.ceil((base + (kms * 350)) / 100) * 100;
                 document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             }
@@ -293,13 +294,12 @@
     }
 
     function enviarWhatsApp() {
-        const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
-        const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+        const linkO = `https://www.google.com/maps/search/?api=1&query=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+        const linkD = `https://www.google.com/maps/search/?api=1&query=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
         
         let nomO = (tipoServicio === 'envio') ? document.getElementById('fNombreO').value : document.getElementById('fNombreS').value;
         let telO = (tipoServicio === 'envio') ? document.getElementById('fTelO').value : document.getElementById('fTelS').value;
         
-        // Datos Destinatario
         let nomD = (tipoServicio === 'envio') ? document.getElementById('fNombreD').value : "Moto Mandaditos";
         let telD = (tipoServicio === 'envio') ? document.getElementById('fTelD').value : "";
 
