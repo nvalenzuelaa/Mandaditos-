@@ -82,11 +82,11 @@
 
     <div class="space-y-4 mb-4">
         <div>
-            <label class="label-pro">📍 Punto A (Donde retiro) 🏍️</label>
+            <label class="label-pro">📍 Punto A (Donde retiro/compro) 🏍️</label>
             <input id="inputO" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
         <div>
-            <label class="label-pro">🏁 Punto B (Donde entrego) 📦</label>
+            <label class="label-pro">🏁 Punto B (Donde entrego) 🏠</label>
             <input id="inputD" type="text" placeholder="Escriba calle y altura..." class="input-pro">
         </div>
     </div>
@@ -131,12 +131,12 @@
     <div id="formSimple" class="hidden mt-6 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
         <div class="grid grid-cols-2 gap-3">
             <div class="col-span-2">
-                <label class="label-pro">🙋‍♂️ Tu Nombre</label>
-                <input id="fNombreS" type="text" class="input-pro">
+                <label class="label-pro">🙋‍♂️ Tu Nombre (Solicitante)</label>
+                <input id="fNombreS" type="text" placeholder="Tu nombre" class="input-pro">
             </div>
             <div class="col-span-2">
                 <label class="label-pro">📱 Tu WhatsApp</label>
-                <input id="fTelS" type="tel" class="input-pro">
+                <input id="fTelS" type="tel" placeholder="Tu WhatsApp" class="input-pro">
             </div>
         </div>
     </div>
@@ -144,14 +144,10 @@
     <div class="mt-6">
         <label id="labelDetalle" class="label-pro">📦 Detalles del Pedido</label>
         <textarea id="obs" placeholder="Ej: Una caja de zapatos..." class="input-pro h-24 resize-none"></textarea>
-        <div class="warning-box">
-            <i class="fas fa-box-open text-orange-500"></i>
-            <p class="warning-text">Solo productos **chicos o medianos**. No bultos grandes. 🚫📦</p>
-        </div>
     </div>
 
     <div id="pagoMercaderia" class="mt-6 p-4 rounded-2xl border-2 border-dashed border-slate-200 text-center">
-        <label class="label-pro">💰 ¿Pagar producto al retirar?</label>
+        <label id="labelPago" class="label-pro">💰 ¿Pagar producto al retirar?</label>
         <div class="flex justify-center gap-8 mt-2">
             <label class="font-bold cursor-pointer"><input type="radio" name="pago" value="si" onclick="document.getElementById('montoBox').style.display='block'"> SÍ</label>
             <label class="font-bold cursor-pointer"><input type="radio" name="pago" value="no" checked onclick="document.getElementById('montoBox').style.display='none'"> NO</label>
@@ -254,22 +250,29 @@
     function setServicio(tipo) {
         tipoServicio = tipo;
         ['btnEnvio', 'btnCompra', 'btnTramite'].forEach(b => document.getElementById(b).className = b.includes(tipo.charAt(0).toUpperCase() + tipo.slice(1)) ? "tab-btn tab-active" : "tab-btn tab-inactive");
+        
         const labelDetalle = document.getElementById('labelDetalle');
         const obsArea = document.getElementById('obs');
+        const labelPago = document.getElementById('labelPago');
+
         if(tipo === 'tramite') {
             labelDetalle.innerText = "📂 Detalles del Trámite";
             obsArea.placeholder = "Ej: Retirar documentos, pagar boleta de luz...";
+            labelPago.innerText = "💰 ¿Hay que pagar algo en el trámite?";
         } else if(tipo === 'compra') {
-            labelDetalle.innerText = "🛒 Detalles de la Compra";
+            labelDetalle.innerText = "🛒 Lista de Compra";
             obsArea.placeholder = "Ej: 1 Leche, 1 Pan, 1 tira de paracetamol...";
+            labelPago.innerText = "💰 ¿Cuánto se gasta en la compra?";
         } else {
             labelDetalle.innerText = "📦 Detalles del Envío";
             obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
+            labelPago.innerText = "💰 ¿Pagar producto al retirar?";
         }
+
         document.getElementById('formEnvio').classList.toggle('hidden', tipo !== 'envio');
         document.getElementById('formSimple').classList.toggle('hidden', tipo === 'envio');
-        document.getElementById('pagoMercaderia').classList.toggle('hidden', tipo !== 'envio');
         document.getElementById('avisoCompra').classList.toggle('hidden', tipo !== 'compra');
+        
         if(interactuado) trazar();
     }
 
@@ -277,47 +280,49 @@
         const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
 
-        let nomO, telO, nomD, telD;
-
-        if (tipoServicio === 'envio') {
-            nomO = document.getElementById('fNombreO').value || "No especificado";
-            telO = document.getElementById('fTelO').value || "No especificado";
-            nomD = document.getElementById('fNombreD').value || "No especificado";
-            telD = document.getElementById('fTelD').value || "No especificado";
-        } else {
-            nomO = document.getElementById('fNombreS').value || "No especificado";
-            telO = document.getElementById('fTelS').value || "No especificado";
-            nomD = "Moto Mandaditos";
-            telD = "-";
-        }
-
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? (parseInt(document.getElementById('fMonto').value) || 0) : 0;
-        
-        let txt = `*📋 NUEVO PEDIDO* %0A`;
-        txt += `*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A`;
-        
-        txt += `*📍 PUNTO A (Retiro):*%0A`;
-        txt += `🏠 Dir: ${document.getElementById('inputO').value}%0A`;
-        txt += `👤 Ref: ${nomO}%0A`;
-        txt += `📱 Tel: ${telO}%0A`;
-        txt += `🗺️ Mapa: ${linkO}%0A%0A`;
-        
-        txt += `*🏁 PUNTO B (Entrega):*%0A`;
-        txt += `🏠 Dir: ${document.getElementById('inputD').value}%0A`;
-        txt += `👤 Ref: ${nomD}%0A`;
-        if(tipoServicio === 'envio') txt += `📱 Tel: ${telD}%0A`;
-        txt += `🗺️ Mapa: ${linkD}%0A%0A`;
-        
-        txt += `*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A`;
-        
-        txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
-        
-        if(tipoServicio === 'envio' && hayPago) {
-            txt += `%0A🛒 PAGO MERCADERÍA: $${monto}`;
-            txt += `%0A💵 TOTAL A COBRAR: $${costoEnvio + monto}`;
-        } else if (tipoServicio === 'compra') {
-            txt += `%0A⚠️ _Recordar abono del producto por adelantado_`;
+        const detalles = document.getElementById('obs').value;
+        const dirA = document.getElementById('inputO').value;
+        const dirB = document.getElementById('inputD').value;
+
+        let txt = `*📋 NUEVO PEDIDO: ${tipoServicio.toUpperCase()}*%0A%0A`;
+
+        if (tipoServicio === 'envio') {
+            const nomO = document.getElementById('fNombreO').value;
+            const telO = document.getElementById('fTelO').value;
+            const nomD = document.getElementById('fNombreD').value;
+            const telD = document.getElementById('fTelD').value;
+
+            txt += `*📍 PUNTO A (Retiro):*%0A🏠 ${dirA}%0A👤 ${nomO}%0A📱 ${telO}%0A🗺️ ${linkO}%0A%0A`;
+            txt += `*🏁 PUNTO B (Entrega):*%0A🏠 ${dirB}%0A👤 ${nomD}%0A📱 ${telD}%0A🗺️ ${linkD}%0A%0A`;
+            txt += `*📦 DETALLES:* ${detalles}%0A%0A`;
+            txt += `*💰 COSTO ENVÍO: $${costoEnvio}*`;
+            if(hayPago) {
+                txt += `%0A🛒 PRODUCTO: $${monto}%0A💵 TOTAL A COBRAR: $${costoEnvio + monto}`;
+            }
+        } 
+        else if (tipoServicio === 'compra') {
+            const nomS = document.getElementById('fNombreS').value;
+            const telS = document.getElementById('fTelS').value;
+
+            txt += `*🛒 LUGAR DE COMPRA (A):*%0A🏠 ${dirA}%0A🗺️ ${linkO}%0A%0A`;
+            txt += `*🏠 DIRECCIÓN DE ENTREGA (B):*%0A🏠 ${dirB}%0A🗺️ ${linkD}%0A%0A`;
+            txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
+            txt += `*📝 LISTA:* ${detalles}%0A%0A`;
+            txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
+            if(hayPago) txt += `%0A🛒 GASTO COMPRA: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
+            txt += `%0A%0A⚠️ *NOTA:* Para confirmar, el servicio se abona por adelantado.`;
+        } 
+        else if (tipoServicio === 'tramite') {
+            const nomS = document.getElementById('fNombreS').value;
+            const telS = document.getElementById('fTelS').value;
+
+            txt += `*📍 PUNTO A (Donde se realiza):*%0A🏠 ${dirA}%0A🗺️ ${linkO}%0A%0A`;
+            txt += `*🏁 PUNTO B (Destino final):*%0A🏠 ${dirB}%0A🗺️ ${linkD}%0A%0A`;
+            txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
+            txt += `*📂 DETALLES:* ${detalles}%0A%0A`;
+            txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
         }
 
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
