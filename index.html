@@ -259,14 +259,17 @@
             labelDetalle.innerText = "📂 Detalles del Trámite";
             obsArea.placeholder = "Ej: Retirar documentos, pagar boleta de luz...";
             labelPago.innerText = "💰 ¿Hay que pagar algo en el trámite?";
+            document.getElementById('pagoMercaderia').classList.remove('hidden');
         } else if(tipo === 'compra') {
             labelDetalle.innerText = "🛒 Lista de Compra";
             obsArea.placeholder = "Ej: 1 Leche, 1 Pan, 1 tira de paracetamol...";
-            labelPago.innerText = "💰 ¿Cuánto se gasta en la compra?";
+            // Ocultamos la caja de pago en compras por ser redundante
+            document.getElementById('pagoMercaderia').classList.add('hidden');
         } else {
             labelDetalle.innerText = "📦 Detalles del Envío";
             obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
             labelPago.innerText = "💰 ¿Pagar producto al retirar?";
+            document.getElementById('pagoMercaderia').classList.remove('hidden');
         }
 
         document.getElementById('formEnvio').classList.toggle('hidden', tipo !== 'envio');
@@ -311,7 +314,6 @@
             txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
             txt += `*📝 LISTA:* ${detalles}%0A%0A`;
             txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
-            if(hayPago) txt += `%0A🛒 GASTO COMPRA: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
             txt += `%0A%0A⚠️ *NOTA:* Para confirmar, el servicio se abona por adelantado.`;
         } 
         else if (tipoServicio === 'tramite') {
@@ -323,6 +325,7 @@
             txt += `*👤 SOLICITANTE:* ${nomS}%0A📱 ${telS}%0A%0A`;
             txt += `*📂 DETALLES:* ${detalles}%0A%0A`;
             txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
+            if(hayPago) txt += `%0A🛒 GASTO TRÁMITE: $${monto}`;
         }
 
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
