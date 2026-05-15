@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mandaditos App</title> 
 
-<!-- PWA CONFIG -->
 <link rel="apple-touch-icon" href="png.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +25,7 @@
     .aviso-cerrado-card { background: #0f172a; color: white; padding: 45px 30px; border-radius: 35px; text-align: center; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.4); width: 100%; max-width: 340px; }
 
     .header-logo { height: 80px; width: auto; margin: 0 auto; }
-    
+
     .tab-container { background: #f1f5f9; padding: 5px; border-radius: 18px; display: flex; gap: 4px; }
     .tab-btn { flex: 1; padding: 12px 5px; border-radius: 14px; font-weight: 700; font-size: 11px; transition: 0.3s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tab-active { background: #ffffff; color: #1e40af; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
@@ -54,7 +53,7 @@
 
     .btn-submit { background: #16a34a; color: white; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .btn-install { background: #1e293b; color: white; padding: 12px; border-radius: 15px; font-size: 11px; font-weight: 700; width: 90%; margin: 20px auto 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    
+
     /* Ajuste para sugerencias de Google Maps */
     .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
 </style>
@@ -70,7 +69,7 @@
 </div>
 
 <div class="app-container p-5">
-    
+
     <header class="text-center mb-6">
         <img src="png.png" alt="Logo" class="header-logo">
         <div class="flex items-center justify-center gap-2 mt-2 opacity-70">
@@ -296,14 +295,21 @@
     function enviarWhatsApp() {
         const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+        
         let nomO = (tipoServicio === 'envio') ? document.getElementById('fNombreO').value : document.getElementById('fNombreS').value;
         let telO = (tipoServicio === 'envio') ? document.getElementById('fTelO').value : document.getElementById('fTelS').value;
+        
+        // Datos Destinatario
         let nomD = (tipoServicio === 'envio') ? document.getElementById('fNombreD').value : "Moto Mandaditos";
         let telD = (tipoServicio === 'envio') ? document.getElementById('fTelD').value : "";
+
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? parseInt(document.getElementById('fMonto').value) || 0 : 0;
-        let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
+        
+        let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A📱 ${telD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
+        
         if(hayPago) txt += `%0A🛒 PAGO PRODUCTO: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
+        
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
     }
 
