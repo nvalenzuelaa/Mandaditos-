@@ -266,7 +266,7 @@
             if (stat === 'OK') {
                 directionsRenderer.setDirections(res);
                 let kms = (res.routes[0].legs[0].distance.value / 1000);
-                let base = (tipoServicio === 'envio') ? 3000 : 4000;
+                let base = (tipoServicio === 'envio') ? 3000 : 5000;
                 costoEnvio = Math.ceil((base + (kms * 350)) / 100) * 100;
                 document.getElementById('precioTotal').innerText = costoEnvio.toLocaleString('es-AR');
             }
