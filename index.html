@@ -258,10 +258,10 @@
         const obsArea = document.getElementById('obs');
         if(tipo === 'tramite') {
             labelDetalle.innerText = "📂 Detalles del Trámite";
-            obsArea.placeholder = "Ej: Retirar documentos, retirar estudios médicos...";
+            obsArea.placeholder = "Ej: Retirar documentos, pagar boleta de luz...";
         } else if(tipo === 'compra') {
-            labelDetalle.innerText = "🛒 Detalles de la compra";
-            obsArea.placeholder = "Ej: Comprar medicamentos, leche, pan, etc...";
+            labelDetalle.innerText = "🛒 Detalles de la Compra";
+            obsArea.placeholder = "Ej: 1 Leche, 1 Pan, 1 tira de paracetamol...";
         } else {
             labelDetalle.innerText = "📦 Detalles del Envío";
             obsArea.placeholder = "Ej: Una caja de zapatos, llaves...";
@@ -274,22 +274,57 @@
     }
 
     function enviarWhatsApp() {
-        const linkO = `https://www.google.com/maps/search/?api=1&query=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
-        const linkD = `https://www.google.com/maps/search/?api=1&query=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
-        let nomO = (tipoServicio === 'envio') ? document.getElementById('fNombreO').value : document.getElementById('fNombreS').value;
-        let telO = (tipoServicio === 'envio') ? document.getElementById('fTelO').value : document.getElementById('fTelS').value;
-        let nomD = (tipoServicio === 'envio') ? document.getElementById('fNombreD').value : "Moto Mandaditos";
-        let telD = (tipoServicio === 'envio') ? document.getElementById('fTelD').value : "";
+        const linkO = `https://www.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+        const linkD = `https://www.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+
+        let nomO, telO, nomD, telD;
+
+        if (tipoServicio === 'envio') {
+            nomO = document.getElementById('fNombreO').value || "No especificado";
+            telO = document.getElementById('fTelO').value || "No especificado";
+            nomD = document.getElementById('fNombreD').value || "No especificado";
+            telD = document.getElementById('fTelD').value || "No especificado";
+        } else {
+            nomO = document.getElementById('fNombreS').value || "No especificado";
+            telO = document.getElementById('fTelS').value || "No especificado";
+            nomD = "Moto Mandaditos";
+            telD = "-";
+        }
+
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
-        const monto = hayPago ? parseInt(document.getElementById('fMonto').value) || 0 : 0;
-        let txt = `*📋 NUEVO PEDIDO*%0A*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A*📍 RETIRO (A):*%0A👤 ${nomO}%0A📱 ${telO}%0A🏠 ${document.getElementById('inputO').value}%0A🗺️ ${linkO}%0A%0A*🏁 ENTREGA (B):*%0A👤 ${nomD}%0A📱 ${telD}%0A🏠 ${document.getElementById('inputD').value}%0A🗺️ ${linkD}%0A%0A*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A*💰 COSTO: $${costoEnvio}*`;
-        if(hayPago) txt += `%0A🛒 PAGO PRODUCTO: $${monto}%0A💵 TOTAL: $${costoEnvio + monto}`;
+        const monto = hayPago ? (parseInt(document.getElementById('fMonto').value) || 0) : 0;
+        
+        let txt = `*📋 NUEVO PEDIDO* %0A`;
+        txt += `*Servicio:* ${tipoServicio.toUpperCase()}%0A%0A`;
+        
+        txt += `*📍 PUNTO A (Retiro):*%0A`;
+        txt += `🏠 Dir: ${document.getElementById('inputO').value}%0A`;
+        txt += `👤 Ref: ${nomO}%0A`;
+        txt += `📱 Tel: ${telO}%0A`;
+        txt += `🗺️ Mapa: ${linkO}%0A%0A`;
+        
+        txt += `*🏁 PUNTO B (Entrega):*%0A`;
+        txt += `🏠 Dir: ${document.getElementById('inputD').value}%0A`;
+        txt += `👤 Ref: ${nomD}%0A`;
+        if(tipoServicio === 'envio') txt += `📱 Tel: ${telD}%0A`;
+        txt += `🗺️ Mapa: ${linkD}%0A%0A`;
+        
+        txt += `*📝 DETALLES:* ${document.getElementById('obs').value}%0A%0A`;
+        
+        txt += `*💰 COSTO SERVICIO: $${costoEnvio}*`;
+        
+        if(tipoServicio === 'envio' && hayPago) {
+            txt += `%0A🛒 PAGO MERCADERÍA: $${monto}`;
+            txt += `%0A💵 TOTAL A COBRAR: $${costoEnvio + monto}`;
+        } else if (tipoServicio === 'compra') {
+            txt += `%0A⚠️ _Recordar abono del producto por adelantado_`;
+        }
+
         window.location.href = `https://api.whatsapp.com/send?phone=543764904731&text=${txt}`;
     }
 
     function cancelarPedido() {
         if(confirm("¿Estás seguro que deseas cancelar?")) {
-            // Recarga la página para limpiar todo y volver al estado inicial
             location.reload();
         }
     }
