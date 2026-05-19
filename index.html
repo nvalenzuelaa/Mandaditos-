@@ -206,7 +206,7 @@
             if(btnSubmit) {
                 btnSubmit.style.background = '#64748b';
                 btnSubmit.innerHTML = '<i class="fas fa-lock"></i> SERVICIO CERRADO';
-                btnSubmit.disabled = true;
+                btnSubmit.disabled = false;
                 btnSubmit.onclick = function(e) { e.preventDefault(); alert('En este momento el servicio se encuentra cerrado.'); };
             }
         }
