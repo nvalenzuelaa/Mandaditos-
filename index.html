@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mandaditos App</title> 
 
-<link rel="apple-touch-icon" href="png.png">
+<link class="apple-touch-icon" href="png.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mandaditos">
@@ -19,7 +19,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
     body { background-color: #f8fafc; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
-    .app-container { max-width: 480px; margin: 0 auto; background: #ffffff; min-height: 100vh; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.05); padding-bottom: 80px; }
+    .app-container { max-width: 480px; margin: 0 auto; background: #ffffff; min-height: 100vh; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.05); padding-bottom: 80px; transition: filter 0.3s ease; }
 
     .header-logo { height: 80px; width: auto; margin: 0 auto; }
 
@@ -53,11 +53,24 @@
     .fb { background: #1877F2; }
 
     .pac-container { border-radius: 15px; border: none; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 5px; }
+
+    /* Estilos del bloqueo de pantalla */
+    .app-blur { filter: blur(8px); pointer-events: none; user-select: none; }
+    .overlay-cerrado { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .cartel-cerrado { background: white; padding: 30px 24px; border-radius: 28px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 4px solid #dc2626; }
 </style>
 </head>
 <body onload="initMap()">
 
-<div class="app-container p-5">
+<div id="overlayBloqueo" class="overlay-cerrado hidden">
+    <div class="cartel-cerrado">
+        <div class="text-5xl mb-4">🏍️🚫</div>
+        <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">Servicio Cerrado</h2>
+        <p class="text-slate-500 mt-2 font-medium leading-relaxed">En este momento no estamos recibiendo pedidos. ¡Te esperamos pronto!</p>
+    </div>
+</div>
+
+<div id="appMainContainer" class="app-container p-5">
 
     <header class="text-center mb-6">
         <img src="png.png" alt="Logo" class="header-logo">
@@ -195,20 +208,16 @@
     // ===================================================
     //  CONTROL DE LA APP: CAMBIA A 'false' PARA DESACTIVAR
     // ===================================================
-    const APP_ACTIVA = false; 
+    const APP_ACTIVA = true; 
 
     function initMap() {
-        // Ejecutar bloqueo si la app está en false
+        // Ejecutar bloqueo completo si la app está en false
         if (!APP_ACTIVA) {
             document.getElementById('estado-online').classList.add('hidden');
             document.getElementById('estado-offline').classList.remove('hidden');
-            const btnSubmit = document.getElementById('btnSubmitPedido');
-            if(btnSubmit) {
-                btnSubmit.style.background = '#64748b';
-                btnSubmit.innerHTML = '<i class="fas fa-lock"></i> SERVICIO CERRADO';
-                btnSubmit.disabled = true;
-                btnSubmit.onclick = function(e) { e.preventDefault(); alert('En este momento el servicio se encuentra cerrado.'); };
-            }
+            document.getElementById('appMainContainer').classList.add('app-blur');
+            document.getElementById('overlayBloqueo').classList.remove('hidden');
+            return; // Detiene la carga para evitar consumo de recursos
         }
 
         geocoder = new google.maps.Geocoder();
@@ -284,10 +293,7 @@
     }
 
     function enviarWhatsApp() {
-        if (!APP_ACTIVA) {
-            alert('En este momento el servicio se encuentra cerrado.');
-            return;
-        }
+        if (!APP_ACTIVA) return;
 
         const linkO = `http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `http://maps.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
@@ -316,8 +322,4 @@
     function cancelarPedido() { if(confirm("¿Cancelar?")) location.reload(); }
 
     document.getElementById('installBtn').addEventListener('click', () => {
-        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona 'Agregar a Inicio'.");
-    });
-</script>
-</body>
-</html>
+        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona
