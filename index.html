@@ -61,9 +61,13 @@
 
     <header class="text-center mb-6">
         <img src="png.png" alt="Logo" class="header-logo">
-        <div class="flex items-center justify-center gap-2 mt-2 opacity-70">
+        <div id="estado-online" class="flex items-center justify-center gap-2 mt-2 opacity-70">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             <span class="text-[9px] font-bold uppercase tracking-widest">Servicio Activo</span>
+        </div>
+        <div id="estado-offline" class="flex items-center justify-center gap-2 mt-2 hidden">
+            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-red-600">Servicio Cerrado</span>
         </div>
     </header>
 
@@ -162,7 +166,7 @@
     </div>
 
     <div class="mt-8 px-2 flex flex-col items-center">
-        <button onclick="enviarWhatsApp()" class="btn-submit shadow-xl mb-3"><i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO</button>
+        <button id="btnSubmitPedido" onclick="enviarWhatsApp()" class="btn-submit shadow-xl mb-3"><i class="fab fa-whatsapp text-2xl"></i> CONFIRMAR PEDIDO</button>
         <button onclick="cancelarPedido()" class="btn-cancel"><i class="fas fa-times"></i> Cancelar pedido</button>
     </div>
 
@@ -188,7 +192,25 @@
     let map, directionsService, directionsRenderer, markerO, markerD, geocoder;
     let interactuado = false;
 
+    // ===================================================
+    //  CONTROL DE LA APP: CAMBIA A 'false' PARA DESACTIVAR
+    // ===================================================
+    const APP_ACTIVA = true; 
+
     function initMap() {
+        // Ejecutar bloqueo si la app está en false
+        if (!APP_ACTIVA) {
+            document.getElementById('estado-online').classList.add('hidden');
+            document.getElementById('estado-offline').classList.remove('hidden');
+            const btnSubmit = document.getElementById('btnSubmitPedido');
+            if(btnSubmit) {
+                btnSubmit.style.background = '#64748b';
+                btnSubmit.innerHTML = '<i class="fas fa-lock"></i> SERVICIO CERRADO';
+                btnSubmit.disabled = true;
+                btnSubmit.onclick = function(e) { e.preventDefault(); alert('En este momento el servicio se encuentra cerrado.'); };
+            }
+        }
+
         geocoder = new google.maps.Geocoder();
         directionsService = new google.maps.DirectionsService();
         directionsRenderer = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: "#1e40af", strokeWeight: 5 }, suppressMarkers: true });
@@ -262,6 +284,11 @@
     }
 
     function enviarWhatsApp() {
+        if (!APP_ACTIVA) {
+            alert('En este momento el servicio se encuentra cerrado.');
+            return;
+        }
+
         const linkO = `http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
         const linkD = `http://maps.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
