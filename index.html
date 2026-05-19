@@ -195,7 +195,7 @@
     // ===================================================
     //  CONTROL DE LA APP: CAMBIA A 'false' PARA DESACTIVAR
     // ===================================================
-    const APP_ACTIVA = true; 
+    const APP_ACTIVA = false; 
 
     function initMap() {
         // Ejecutar bloqueo si la app está en false
@@ -206,7 +206,7 @@
             if(btnSubmit) {
                 btnSubmit.style.background = '#64748b';
                 btnSubmit.innerHTML = '<i class="fas fa-lock"></i> SERVICIO CERRADO';
-                btnSubmit.disabled = false;
+                btnSubmit.disabled = true;
                 btnSubmit.onclick = function(e) { e.preventDefault(); alert('En este momento el servicio se encuentra cerrado.'); };
             }
         }
