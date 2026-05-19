@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mandaditos App</title> 
 
-<link class="apple-touch-icon" href="png.png">
+<link rel="apple-touch-icon" href="png.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mandaditos">
@@ -217,7 +217,7 @@
             document.getElementById('estado-offline').classList.remove('hidden');
             document.getElementById('appMainContainer').classList.add('app-blur');
             document.getElementById('overlayBloqueo').classList.remove('hidden');
-            return; // Detiene la carga para evitar consumo de recursos
+            return;
         }
 
         geocoder = new google.maps.Geocoder();
@@ -295,8 +295,8 @@
     function enviarWhatsApp() {
         if (!APP_ACTIVA) return;
 
-        const linkO = `http://maps.google.com/maps?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
-        const linkD = `http://maps.google.com/maps?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
+        const linkO = `http://maps.google.com/?q=${markerO.getPosition().lat()},${markerO.getPosition().lng()}`;
+        const linkD = `http://maps.google.com/?q=${markerD.getPosition().lat()},${markerD.getPosition().lng()}`;
         const hayPago = document.querySelector('input[name="pago"]:checked').value === 'si';
         const monto = hayPago ? (document.getElementById('fMonto').value || 0) : 0;
         
@@ -322,4 +322,8 @@
     function cancelarPedido() { if(confirm("¿Cancelar?")) location.reload(); }
 
     document.getElementById('installBtn').addEventListener('click', () => {
-        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona
+        alert("Para instalar:\n1. Toca 'Compartir' (iPhone) o los puntos del menú (Android).\n2. Selecciona 'Agregar a Inicio'.");
+    });
+</script>
+</body>
+</html>
